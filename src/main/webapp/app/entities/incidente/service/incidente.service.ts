@@ -11,11 +11,15 @@ import { IIncidente, NewIncidente } from '../incidente.model';
 
 export type PartialUpdateIncidente = Partial<IIncidente> & Pick<IIncidente, 'id'>;
 
-type RestOf<T extends IIncidente | NewIncidente> = Omit<T, 'detectadoEn' | 'reconocidoEn' | 'mitigadoEn' | 'resueltoEn'> & {
+type RestOf<T extends IIncidente | NewIncidente> = Omit<
+  T,
+  'detectadoEn' | 'reconocidoEn' | 'mitigadoEn' | 'resueltoEn' | 'silenciadoHasta'
+> & {
   detectadoEn?: string | null;
   reconocidoEn?: string | null;
   mitigadoEn?: string | null;
   resueltoEn?: string | null;
+  silenciadoHasta?: string | null;
 };
 
 export type RestIncidente = RestOf<IIncidente>;
@@ -53,6 +57,7 @@ export class IncidentesService {
       reconocidoEn: restIncidente.reconocidoEn ? dayjs(restIncidente.reconocidoEn) : undefined,
       mitigadoEn: restIncidente.mitigadoEn ? dayjs(restIncidente.mitigadoEn) : undefined,
       resueltoEn: restIncidente.resueltoEn ? dayjs(restIncidente.resueltoEn) : undefined,
+      silenciadoHasta: restIncidente.silenciadoHasta ? dayjs(restIncidente.silenciadoHasta) : undefined,
     };
   }
 }
@@ -132,6 +137,7 @@ export class IncidenteService extends IncidentesService {
       reconocidoEn: incidente.reconocidoEn?.toJSON() ?? null,
       mitigadoEn: incidente.mitigadoEn?.toJSON() ?? null,
       resueltoEn: incidente.resueltoEn?.toJSON() ?? null,
+      silenciadoHasta: incidente.silenciadoHasta?.toJSON() ?? null,
     };
   }
 

@@ -48,6 +48,8 @@ public class IncidenteDTO implements Serializable {
 
     private Boolean cumplioObjetivo;
 
+    private Instant silenciadoHasta;
+
     private UserDTO comandante;
 
     private Set<ServicioDTO> servicios = new HashSet<>();
@@ -140,6 +142,14 @@ public class IncidenteDTO implements Serializable {
         this.cumplioObjetivo = cumplioObjetivo;
     }
 
+    public Instant getSilenciadoHasta() {
+        return silenciadoHasta;
+    }
+
+    public void setSilenciadoHasta(Instant silenciadoHasta) {
+        this.silenciadoHasta = silenciadoHasta;
+    }
+
     public UserDTO getComandante() {
         return comandante;
     }
@@ -192,6 +202,7 @@ public class IncidenteDTO implements Serializable {
             ", resueltoEn='" + getResueltoEn() + "'" +
             ", usuariosAfectados=" + getUsuariosAfectados() +
             ", cumplioObjetivo='" + getCumplioObjetivo() + "'" +
+            ", silenciadoHasta='" + getSilenciadoHasta() + "'" +
             ", comandante=" + getComandante() +
             ", servicios=" + getServicios() +
             "}";

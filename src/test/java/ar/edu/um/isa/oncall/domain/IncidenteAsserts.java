@@ -56,7 +56,8 @@ public class IncidenteAsserts {
             .satisfies(a -> assertThat(a.getMitigadoEn()).as("check mitigadoEn").isEqualTo(expected.getMitigadoEn()))
             .satisfies(a -> assertThat(a.getResueltoEn()).as("check resueltoEn").isEqualTo(expected.getResueltoEn()))
             .satisfies(a -> assertThat(a.getUsuariosAfectados()).as("check usuariosAfectados").isEqualTo(expected.getUsuariosAfectados()))
-            .satisfies(a -> assertThat(a.getCumplioObjetivo()).as("check cumplioObjetivo").isEqualTo(expected.getCumplioObjetivo()));
+            .satisfies(a -> assertThat(a.getCumplioObjetivo()).as("check cumplioObjetivo").isEqualTo(expected.getCumplioObjetivo()))
+            .satisfies(a -> assertThat(a.getSilenciadoHasta()).as("check silenciadoHasta").isEqualTo(expected.getSilenciadoHasta()));
     }
 
     /**

@@ -238,3 +238,10 @@ oncall:
     # servicio se pega al incidente ya abierto en vez de abrir uno nuevo. Fuera de la ventana
     # se abre un incidente nuevo aunque el anterior siga sin cerrarse.
     ventana-minutos: 120
+  escalamiento:
+    # Si el reloj que despierta al escalamiento esta prendido. Apagado, la cadena solo avanza
+    # con POST /api/escalamiento/ejecutar.
+    automatico: true
+    # Cada cuanto corre (ISO-8601). Es la resolucion de la regla: un paso de 5 minutos sale
+    # entre los 5:00 y los 5:00 + intervalo.
+    intervalo: PT30S

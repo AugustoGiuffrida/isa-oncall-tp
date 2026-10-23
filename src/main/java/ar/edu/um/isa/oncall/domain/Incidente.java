@@ -71,6 +71,9 @@ public class Incidente implements Serializable {
     @Column(name = "cumplio_objetivo")
     private Boolean cumplioObjetivo;
 
+    @Column(name = "silenciado_hasta")
+    private Instant silenciadoHasta;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User comandante;
 
@@ -97,6 +100,11 @@ public class Incidente implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "incidente" }, allowSetters = true)
     private Set<EventoDeIncidente> eventos = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "incidente")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "incidente", "paso", "destinatario" }, allowSetters = true)
+    private Set<EjecucionDeEscalamiento> ejecucionDeEscalamientos = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "incidente")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -248,6 +256,19 @@ public class Incidente implements Serializable {
         this.cumplioObjetivo = cumplioObjetivo;
     }
 
+    public Instant getSilenciadoHasta() {
+        return this.silenciadoHasta;
+    }
+
+    public Incidente silenciadoHasta(Instant silenciadoHasta) {
+        this.setSilenciadoHasta(silenciadoHasta);
+        return this;
+    }
+
+    public void setSilenciadoHasta(Instant silenciadoHasta) {
+        this.silenciadoHasta = silenciadoHasta;
+    }
+
     public User getComandante() {
         return this.comandante;
     }
@@ -365,6 +386,37 @@ public class Incidente implements Serializable {
         return this;
     }
 
+    public Set<EjecucionDeEscalamiento> getEjecucionDeEscalamientos() {
+        return this.ejecucionDeEscalamientos;
+    }
+
+    public void setEjecucionDeEscalamientos(Set<EjecucionDeEscalamiento> ejecucionDeEscalamientos) {
+        if (this.ejecucionDeEscalamientos != null) {
+            this.ejecucionDeEscalamientos.forEach(i -> i.setIncidente(null));
+        }
+        if (ejecucionDeEscalamientos != null) {
+            ejecucionDeEscalamientos.forEach(i -> i.setIncidente(this));
+        }
+        this.ejecucionDeEscalamientos = ejecucionDeEscalamientos;
+    }
+
+    public Incidente ejecucionDeEscalamientos(Set<EjecucionDeEscalamiento> ejecucionDeEscalamientos) {
+        this.setEjecucionDeEscalamientos(ejecucionDeEscalamientos);
+        return this;
+    }
+
+    public Incidente addEjecucionDeEscalamiento(EjecucionDeEscalamiento ejecucionDeEscalamiento) {
+        this.ejecucionDeEscalamientos.add(ejecucionDeEscalamiento);
+        ejecucionDeEscalamiento.setIncidente(this);
+        return this;
+    }
+
+    public Incidente removeEjecucionDeEscalamiento(EjecucionDeEscalamiento ejecucionDeEscalamiento) {
+        this.ejecucionDeEscalamientos.remove(ejecucionDeEscalamiento);
+        ejecucionDeEscalamiento.setIncidente(null);
+        return this;
+    }
+
     public Set<Notificacion> getNotificacions() {
         return this.notificacions;
     }
@@ -430,6 +482,7 @@ public class Incidente implements Serializable {
             ", resueltoEn='" + getResueltoEn() + "'" +
             ", usuariosAfectados=" + getUsuariosAfectados() +
             ", cumplioObjetivo='" + getCumplioObjetivo() + "'" +
+            ", silenciadoHasta='" + getSilenciadoHasta() + "'" +
             "}";
     }
 }

@@ -112,6 +112,13 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="silenciadoHasta">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.incidente.silenciadoHasta">Silenciado Hasta</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col" jhiSortBy="comandante.login">
               <div class="d-flex">
                 <span jhiTranslate="oncallApp.incidente.comandante">Comandante</span>
@@ -150,6 +157,7 @@
               <td>{{ incidente.resueltoEn | formatMediumDatetime }}</td>
               <td>{{ incidente.usuariosAfectados }}</td>
               <td>{{ incidente.cumplioObjetivo }}</td>
+              <td>{{ incidente.silenciadoHasta | formatMediumDatetime }}</td>
               <td>
                 {{ incidente.comandante?.login }}
               </td>

@@ -45,6 +45,7 @@ describe('Postmortem e2e test', () => {
         resueltoEn: '2023-12-04T08:25:24.412Z',
         usuariosAfectados: 21711,
         cumplioObjetivo: true,
+        silenciadoHasta: '2023-12-04T08:33:25.049Z',
       },
     }).then(({ body }) => {
       incidente = body;

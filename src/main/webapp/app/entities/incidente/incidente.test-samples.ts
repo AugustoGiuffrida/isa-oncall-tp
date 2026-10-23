@@ -11,14 +11,15 @@ export const sampleWithRequiredData: IIncidente = {
 };
 
 export const sampleWithPartialData: IIncidente = {
-  id: 6822,
-  titulo: 'eek',
-  severidad: 'SEV2',
-  estado: 'CERRADO',
-  detectadoEn: dayjs('2023-12-03T23:14'),
-  reconocidoEn: dayjs('2023-12-03T23:16'),
-  mitigadoEn: dayjs('2023-12-04T14:07'),
-  usuariosAfectados: 5399,
+  id: 4347,
+  titulo: 'ew whoa gadzooks',
+  severidad: 'SEV1',
+  estado: 'MITIGADO',
+  detectadoEn: dayjs('2023-12-04T21:25'),
+  reconocidoEn: dayjs('2023-12-04T16:25'),
+  mitigadoEn: dayjs('2023-12-04T14:04'),
+  usuariosAfectados: 15738,
+  silenciadoHasta: dayjs('2023-12-04T08:24'),
 };
 
 export const sampleWithFullData: IIncidente = {
@@ -33,6 +34,7 @@ export const sampleWithFullData: IIncidente = {
   resueltoEn: dayjs('2023-12-04T06:38'),
   usuariosAfectados: 32687,
   cumplioObjetivo: false,
+  silenciadoHasta: dayjs('2023-12-04T09:15'),
 };
 
 export const sampleWithNewData: NewIncidente = {

@@ -63,7 +63,10 @@ public class Alerta implements Serializable {
     private Servicio servicio;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "notificacions" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        allowSetters = true
+    )
     private Incidente incidente;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

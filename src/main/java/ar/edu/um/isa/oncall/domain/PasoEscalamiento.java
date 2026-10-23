@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -55,6 +57,11 @@ public class PasoEscalamiento implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User destinatarioDirecto;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "paso")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "incidente", "paso", "destinatario" }, allowSetters = true)
+    private Set<EjecucionDeEscalamiento> ejecucions = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -146,6 +153,37 @@ public class PasoEscalamiento implements Serializable {
 
     public PasoEscalamiento destinatarioDirecto(User user) {
         this.setDestinatarioDirecto(user);
+        return this;
+    }
+
+    public Set<EjecucionDeEscalamiento> getEjecucions() {
+        return this.ejecucions;
+    }
+
+    public void setEjecucions(Set<EjecucionDeEscalamiento> ejecucionDeEscalamientos) {
+        if (this.ejecucions != null) {
+            this.ejecucions.forEach(i -> i.setPaso(null));
+        }
+        if (ejecucionDeEscalamientos != null) {
+            ejecucionDeEscalamientos.forEach(i -> i.setPaso(this));
+        }
+        this.ejecucions = ejecucionDeEscalamientos;
+    }
+
+    public PasoEscalamiento ejecucions(Set<EjecucionDeEscalamiento> ejecucionDeEscalamientos) {
+        this.setEjecucions(ejecucionDeEscalamientos);
+        return this;
+    }
+
+    public PasoEscalamiento addEjecucion(EjecucionDeEscalamiento ejecucionDeEscalamiento) {
+        this.ejecucions.add(ejecucionDeEscalamiento);
+        ejecucionDeEscalamiento.setPaso(this);
+        return this;
+    }
+
+    public PasoEscalamiento removeEjecucion(EjecucionDeEscalamiento ejecucionDeEscalamiento) {
+        this.ejecucions.remove(ejecucionDeEscalamiento);
+        ejecucionDeEscalamiento.setPaso(null);
         return this;
     }
 

@@ -59,7 +59,10 @@ public class Postmortem implements Serializable {
     @Column(name = "publicado_en")
     private Instant publicadoEn;
 
-    @JsonIgnoreProperties(value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "notificacions" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        allowSetters = true
+    )
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @NotNull
     @JoinColumn(unique = true)

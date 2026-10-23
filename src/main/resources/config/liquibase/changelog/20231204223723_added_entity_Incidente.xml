@@ -44,6 +44,9 @@
             <column name="cumplio_objetivo" type="boolean">
                 <constraints nullable="true" />
             </column>
+            <column name="silenciado_hasta" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
             <column name="comandante_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -53,6 +56,7 @@
         <dropDefaultValue tableName="incidente" columnName="reconocido_en" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="incidente" columnName="mitigado_en" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="incidente" columnName="resuelto_en" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="incidente" columnName="silenciado_hasta" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <changeSet id="20231204223723-1-relations" author="jhipster">
@@ -97,6 +101,7 @@
             <column name="resuelto_en" type="date"/>
             <column name="usuarios_afectados" type="numeric"/>
             <column name="cumplio_objetivo" type="boolean"/>
+            <column name="silenciado_hasta" type="date"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

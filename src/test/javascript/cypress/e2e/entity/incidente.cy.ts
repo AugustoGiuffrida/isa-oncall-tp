@@ -14,7 +14,12 @@ describe('Incidente e2e test', () => {
   const incidentePageUrl = '/incidente';
   let username: string;
   let password: string;
-  const incidenteSample = { titulo: 'developmental', severidad: 'SEV2', estado: 'CERRADO', detectadoEn: '2023-12-04T03:25:48.097Z' };
+  const incidenteSample = {
+    titulo: 'gladly traditionalism',
+    severidad: 'SEV1',
+    estado: 'CERRADO',
+    detectadoEn: '2023-12-04T12:52:00.732Z',
+  };
 
   let incidente;
 
@@ -202,6 +207,10 @@ describe('Incidente e2e test', () => {
       cy.get(`[data-cy="cumplioObjetivo"]`).should('not.be.checked');
       cy.get(`[data-cy="cumplioObjetivo"]`).click();
       cy.get(`[data-cy="cumplioObjetivo"]`).should('be.checked');
+
+      cy.get(`[data-cy="silenciadoHasta"]`).type('2023-12-03T23:32');
+      cy.get(`[data-cy="silenciadoHasta"]`).blur();
+      cy.get(`[data-cy="silenciadoHasta"]`).should('have.value', '2023-12-03T23:32');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

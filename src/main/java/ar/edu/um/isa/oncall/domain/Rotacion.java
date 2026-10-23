@@ -61,7 +61,7 @@ public class Rotacion implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "rotacion")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "politica", "rotacion", "destinatarioDirecto" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "politica", "rotacion", "destinatarioDirecto", "ejecucions" }, allowSetters = true)
     private Set<PasoEscalamiento> pasos = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

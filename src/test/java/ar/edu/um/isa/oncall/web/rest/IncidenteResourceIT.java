@@ -80,6 +80,9 @@ class IncidenteResourceIT {
     private static final Boolean DEFAULT_CUMPLIO_OBJETIVO = false;
     private static final Boolean UPDATED_CUMPLIO_OBJETIVO = true;
 
+    private static final Instant DEFAULT_SILENCIADO_HASTA = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_SILENCIADO_HASTA = Instant.ofEpochMilli(1701729143509L);
+
     private static final String ENTITY_API_URL = "/api/incidentes";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -131,7 +134,8 @@ class IncidenteResourceIT {
             .mitigadoEn(DEFAULT_MITIGADO_EN)
             .resueltoEn(DEFAULT_RESUELTO_EN)
             .usuariosAfectados(DEFAULT_USUARIOS_AFECTADOS)
-            .cumplioObjetivo(DEFAULT_CUMPLIO_OBJETIVO);
+            .cumplioObjetivo(DEFAULT_CUMPLIO_OBJETIVO)
+            .silenciadoHasta(DEFAULT_SILENCIADO_HASTA);
     }
 
     /**
@@ -151,7 +155,8 @@ class IncidenteResourceIT {
             .mitigadoEn(UPDATED_MITIGADO_EN)
             .resueltoEn(UPDATED_RESUELTO_EN)
             .usuariosAfectados(UPDATED_USUARIOS_AFECTADOS)
-            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO);
+            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO)
+            .silenciadoHasta(UPDATED_SILENCIADO_HASTA);
     }
 
     @BeforeEach
@@ -298,7 +303,8 @@ class IncidenteResourceIT {
             .andExpect(jsonPath("$.[*].mitigadoEn").value(hasItem(DEFAULT_MITIGADO_EN.toString())))
             .andExpect(jsonPath("$.[*].resueltoEn").value(hasItem(DEFAULT_RESUELTO_EN.toString())))
             .andExpect(jsonPath("$.[*].usuariosAfectados").value(hasItem(DEFAULT_USUARIOS_AFECTADOS)))
-            .andExpect(jsonPath("$.[*].cumplioObjetivo").value(hasItem(DEFAULT_CUMPLIO_OBJETIVO)));
+            .andExpect(jsonPath("$.[*].cumplioObjetivo").value(hasItem(DEFAULT_CUMPLIO_OBJETIVO)))
+            .andExpect(jsonPath("$.[*].silenciadoHasta").value(hasItem(DEFAULT_SILENCIADO_HASTA.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -339,7 +345,8 @@ class IncidenteResourceIT {
             .andExpect(jsonPath("$.mitigadoEn").value(DEFAULT_MITIGADO_EN.toString()))
             .andExpect(jsonPath("$.resueltoEn").value(DEFAULT_RESUELTO_EN.toString()))
             .andExpect(jsonPath("$.usuariosAfectados").value(DEFAULT_USUARIOS_AFECTADOS))
-            .andExpect(jsonPath("$.cumplioObjetivo").value(DEFAULT_CUMPLIO_OBJETIVO));
+            .andExpect(jsonPath("$.cumplioObjetivo").value(DEFAULT_CUMPLIO_OBJETIVO))
+            .andExpect(jsonPath("$.silenciadoHasta").value(DEFAULT_SILENCIADO_HASTA.toString()));
     }
 
     @Test
@@ -778,6 +785,42 @@ class IncidenteResourceIT {
 
     @Test
     @Transactional
+    void getAllIncidentesBySilenciadoHastaIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedIncidente = incidenteRepository.saveAndFlush(incidente);
+
+        // Get all the incidenteList where silenciadoHasta equals to
+        defaultIncidenteFiltering(
+            "silenciadoHasta.equals=" + DEFAULT_SILENCIADO_HASTA,
+            "silenciadoHasta.equals=" + UPDATED_SILENCIADO_HASTA
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllIncidentesBySilenciadoHastaIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedIncidente = incidenteRepository.saveAndFlush(incidente);
+
+        // Get all the incidenteList where silenciadoHasta in
+        defaultIncidenteFiltering(
+            "silenciadoHasta.in=" + DEFAULT_SILENCIADO_HASTA + "," + UPDATED_SILENCIADO_HASTA,
+            "silenciadoHasta.in=" + UPDATED_SILENCIADO_HASTA
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllIncidentesBySilenciadoHastaIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedIncidente = incidenteRepository.saveAndFlush(incidente);
+
+        // Get all the incidenteList where silenciadoHasta is not null
+        defaultIncidenteFiltering("silenciadoHasta.specified=true", "silenciadoHasta.specified=false");
+    }
+
+    @Test
+    @Transactional
     void getAllIncidentesByComandanteIsEqualToSomething() throws Exception {
         User comandante;
         if (TestUtil.findAll(em, User.class).isEmpty()) {
@@ -843,7 +886,8 @@ class IncidenteResourceIT {
             .andExpect(jsonPath("$.[*].mitigadoEn").value(hasItem(DEFAULT_MITIGADO_EN.toString())))
             .andExpect(jsonPath("$.[*].resueltoEn").value(hasItem(DEFAULT_RESUELTO_EN.toString())))
             .andExpect(jsonPath("$.[*].usuariosAfectados").value(hasItem(DEFAULT_USUARIOS_AFECTADOS)))
-            .andExpect(jsonPath("$.[*].cumplioObjetivo").value(hasItem(DEFAULT_CUMPLIO_OBJETIVO)));
+            .andExpect(jsonPath("$.[*].cumplioObjetivo").value(hasItem(DEFAULT_CUMPLIO_OBJETIVO)))
+            .andExpect(jsonPath("$.[*].silenciadoHasta").value(hasItem(DEFAULT_SILENCIADO_HASTA.toString())));
 
         // Check, that the count call also returns 1
         restIncidenteMockMvc
@@ -901,7 +945,8 @@ class IncidenteResourceIT {
             .mitigadoEn(UPDATED_MITIGADO_EN)
             .resueltoEn(UPDATED_RESUELTO_EN)
             .usuariosAfectados(UPDATED_USUARIOS_AFECTADOS)
-            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO);
+            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO)
+            .silenciadoHasta(UPDATED_SILENCIADO_HASTA);
         IncidenteDTO incidenteDTO = incidenteMapper.toDto(updatedIncidente);
 
         restIncidenteMockMvc
@@ -998,7 +1043,8 @@ class IncidenteResourceIT {
             .mitigadoEn(UPDATED_MITIGADO_EN)
             .resueltoEn(UPDATED_RESUELTO_EN)
             .usuariosAfectados(UPDATED_USUARIOS_AFECTADOS)
-            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO);
+            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO)
+            .silenciadoHasta(UPDATED_SILENCIADO_HASTA);
 
         restIncidenteMockMvc
             .perform(
@@ -1039,7 +1085,8 @@ class IncidenteResourceIT {
             .mitigadoEn(UPDATED_MITIGADO_EN)
             .resueltoEn(UPDATED_RESUELTO_EN)
             .usuariosAfectados(UPDATED_USUARIOS_AFECTADOS)
-            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO);
+            .cumplioObjetivo(UPDATED_CUMPLIO_OBJETIVO)
+            .silenciadoHasta(UPDATED_SILENCIADO_HASTA);
 
         restIncidenteMockMvc
             .perform(

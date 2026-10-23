@@ -13,6 +13,7 @@ const requireRestSample: RestIncidente = {
   reconocidoEn: sampleWithRequiredData.reconocidoEn?.toJSON(),
   mitigadoEn: sampleWithRequiredData.mitigadoEn?.toJSON(),
   resueltoEn: sampleWithRequiredData.resueltoEn?.toJSON(),
+  silenciadoHasta: sampleWithRequiredData.silenciadoHasta?.toJSON(),
 };
 
 describe('Incidente Service', () => {

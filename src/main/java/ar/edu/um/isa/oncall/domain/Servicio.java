@@ -79,7 +79,10 @@ public class Servicio implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "servicios")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "notificacions" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        allowSetters = true
+    )
     private Set<Incidente> incidentes = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

@@ -50,6 +50,7 @@ describe('EventoDeIncidente e2e test', () => {
         resueltoEn: '2023-12-04T04:03:55.614Z',
         usuariosAfectados: 15956,
         cumplioObjetivo: true,
+        silenciadoHasta: '2023-12-04T01:20:17.070Z',
       },
     }).then(({ body }) => {
       incidente = body;

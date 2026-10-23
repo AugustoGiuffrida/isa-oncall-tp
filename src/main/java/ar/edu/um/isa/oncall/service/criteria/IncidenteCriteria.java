@@ -82,6 +82,8 @@ public class IncidenteCriteria implements Serializable, Criteria {
 
     private BooleanFilter cumplioObjetivo;
 
+    private InstantFilter silenciadoHasta;
+
     private LongFilter comandanteId;
 
     private LongFilter servicioId;
@@ -91,6 +93,8 @@ public class IncidenteCriteria implements Serializable, Criteria {
     private LongFilter alertaId;
 
     private LongFilter eventoId;
+
+    private LongFilter ejecucionDeEscalamientoId;
 
     private LongFilter notificacionId;
 
@@ -110,11 +114,13 @@ public class IncidenteCriteria implements Serializable, Criteria {
         this.resueltoEn = other.optionalResueltoEn().map(InstantFilter::copy).orElse(null);
         this.usuariosAfectados = other.optionalUsuariosAfectados().map(IntegerFilter::copy).orElse(null);
         this.cumplioObjetivo = other.optionalCumplioObjetivo().map(BooleanFilter::copy).orElse(null);
+        this.silenciadoHasta = other.optionalSilenciadoHasta().map(InstantFilter::copy).orElse(null);
         this.comandanteId = other.optionalComandanteId().map(LongFilter::copy).orElse(null);
         this.servicioId = other.optionalServicioId().map(LongFilter::copy).orElse(null);
         this.postmortemId = other.optionalPostmortemId().map(LongFilter::copy).orElse(null);
         this.alertaId = other.optionalAlertaId().map(LongFilter::copy).orElse(null);
         this.eventoId = other.optionalEventoId().map(LongFilter::copy).orElse(null);
+        this.ejecucionDeEscalamientoId = other.optionalEjecucionDeEscalamientoId().map(LongFilter::copy).orElse(null);
         this.notificacionId = other.optionalNotificacionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -333,6 +339,25 @@ public class IncidenteCriteria implements Serializable, Criteria {
         this.cumplioObjetivo = cumplioObjetivo;
     }
 
+    public InstantFilter getSilenciadoHasta() {
+        return silenciadoHasta;
+    }
+
+    public Optional<InstantFilter> optionalSilenciadoHasta() {
+        return Optional.ofNullable(silenciadoHasta);
+    }
+
+    public InstantFilter silenciadoHasta() {
+        if (silenciadoHasta == null) {
+            setSilenciadoHasta(new InstantFilter());
+        }
+        return silenciadoHasta;
+    }
+
+    public void setSilenciadoHasta(InstantFilter silenciadoHasta) {
+        this.silenciadoHasta = silenciadoHasta;
+    }
+
     public LongFilter getComandanteId() {
         return comandanteId;
     }
@@ -428,6 +453,25 @@ public class IncidenteCriteria implements Serializable, Criteria {
         this.eventoId = eventoId;
     }
 
+    public LongFilter getEjecucionDeEscalamientoId() {
+        return ejecucionDeEscalamientoId;
+    }
+
+    public Optional<LongFilter> optionalEjecucionDeEscalamientoId() {
+        return Optional.ofNullable(ejecucionDeEscalamientoId);
+    }
+
+    public LongFilter ejecucionDeEscalamientoId() {
+        if (ejecucionDeEscalamientoId == null) {
+            setEjecucionDeEscalamientoId(new LongFilter());
+        }
+        return ejecucionDeEscalamientoId;
+    }
+
+    public void setEjecucionDeEscalamientoId(LongFilter ejecucionDeEscalamientoId) {
+        this.ejecucionDeEscalamientoId = ejecucionDeEscalamientoId;
+    }
+
     public LongFilter getNotificacionId() {
         return notificacionId;
     }
@@ -487,11 +531,13 @@ public class IncidenteCriteria implements Serializable, Criteria {
             Objects.equals(resueltoEn, that.resueltoEn) &&
             Objects.equals(usuariosAfectados, that.usuariosAfectados) &&
             Objects.equals(cumplioObjetivo, that.cumplioObjetivo) &&
+            Objects.equals(silenciadoHasta, that.silenciadoHasta) &&
             Objects.equals(comandanteId, that.comandanteId) &&
             Objects.equals(servicioId, that.servicioId) &&
             Objects.equals(postmortemId, that.postmortemId) &&
             Objects.equals(alertaId, that.alertaId) &&
             Objects.equals(eventoId, that.eventoId) &&
+            Objects.equals(ejecucionDeEscalamientoId, that.ejecucionDeEscalamientoId) &&
             Objects.equals(notificacionId, that.notificacionId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -511,11 +557,13 @@ public class IncidenteCriteria implements Serializable, Criteria {
             resueltoEn,
             usuariosAfectados,
             cumplioObjetivo,
+            silenciadoHasta,
             comandanteId,
             servicioId,
             postmortemId,
             alertaId,
             eventoId,
+            ejecucionDeEscalamientoId,
             notificacionId,
             distinct
         );
@@ -536,11 +584,13 @@ public class IncidenteCriteria implements Serializable, Criteria {
             optionalResueltoEn().map(f -> "resueltoEn=" + f + ", ").orElse("") +
             optionalUsuariosAfectados().map(f -> "usuariosAfectados=" + f + ", ").orElse("") +
             optionalCumplioObjetivo().map(f -> "cumplioObjetivo=" + f + ", ").orElse("") +
+            optionalSilenciadoHasta().map(f -> "silenciadoHasta=" + f + ", ").orElse("") +
             optionalComandanteId().map(f -> "comandanteId=" + f + ", ").orElse("") +
             optionalServicioId().map(f -> "servicioId=" + f + ", ").orElse("") +
             optionalPostmortemId().map(f -> "postmortemId=" + f + ", ").orElse("") +
             optionalAlertaId().map(f -> "alertaId=" + f + ", ").orElse("") +
             optionalEventoId().map(f -> "eventoId=" + f + ", ").orElse("") +
+            optionalEjecucionDeEscalamientoId().map(f -> "ejecucionDeEscalamientoId=" + f + ", ").orElse("") +
             optionalNotificacionId().map(f -> "notificacionId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";

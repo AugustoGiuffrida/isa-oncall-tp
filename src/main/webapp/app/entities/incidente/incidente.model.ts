@@ -17,6 +17,7 @@ export interface IIncidente {
   resueltoEn?: dayjs.Dayjs | null;
   usuariosAfectados?: number | null;
   cumplioObjetivo?: boolean | null;
+  silenciadoHasta?: dayjs.Dayjs | null;
   comandante?: Pick<IUser, 'id' | 'login'> | null;
   servicios?: Pick<IServicio, 'id' | 'nombre'>[] | null;
 }

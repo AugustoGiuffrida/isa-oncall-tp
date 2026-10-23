@@ -72,6 +72,11 @@ const routes: Routes = [
     loadChildren: () => import('./accion-correctiva/accion-correctiva.routes'),
   },
   {
+    path: 'ejecucion-de-escalamiento',
+    data: { pageTitle: 'oncallApp.ejecucionDeEscalamiento.home.title' },
+    loadChildren: () => import('./ejecucion-de-escalamiento/ejecucion-de-escalamiento.routes'),
+  },
+  {
     path: 'user-management',
     data: { pageTitle: 'userManagement.home.title' },
     loadChildren: () => import('./admin/user-management/user-management.routes'),

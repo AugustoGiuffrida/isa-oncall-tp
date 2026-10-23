@@ -23,7 +23,8 @@
       "canal": "Canal",
       "politica": "Politica",
       "rotacion": "Rotacion",
-      "destinatarioDirecto": "Destinatario Directo"
+      "destinatarioDirecto": "Destinatario Directo",
+      "ejecucion": "Ejecucion"
     }
   }
 }

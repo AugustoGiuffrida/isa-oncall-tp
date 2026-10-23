@@ -58,6 +58,7 @@ public class CacheConfiguration {
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".servicios");
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".alertas");
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".eventos");
+            createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".ejecucionDeEscalamientos");
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".notificacions");
             createCache(cm, ar.edu.um.isa.oncall.domain.EventoDeIncidente.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.Rotacion.class.getName());
@@ -67,10 +68,12 @@ public class CacheConfiguration {
             createCache(cm, ar.edu.um.isa.oncall.domain.PoliticaEscalamiento.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.PoliticaEscalamiento.class.getName() + ".pasos");
             createCache(cm, ar.edu.um.isa.oncall.domain.PasoEscalamiento.class.getName());
+            createCache(cm, ar.edu.um.isa.oncall.domain.PasoEscalamiento.class.getName() + ".ejecucions");
             createCache(cm, ar.edu.um.isa.oncall.domain.Notificacion.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.Postmortem.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.Postmortem.class.getName() + ".accions");
             createCache(cm, ar.edu.um.isa.oncall.domain.AccionCorrectiva.class.getName());
+            createCache(cm, ar.edu.um.isa.oncall.domain.EjecucionDeEscalamiento.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

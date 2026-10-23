@@ -20,11 +20,15 @@ type IncidenteFormGroupInput = IIncidente | PartialWithRequiredKeyOf<NewIncident
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends IIncidente | NewIncidente> = Omit<T, 'detectadoEn' | 'reconocidoEn' | 'mitigadoEn' | 'resueltoEn'> & {
+type FormValueOf<T extends IIncidente | NewIncidente> = Omit<
+  T,
+  'detectadoEn' | 'reconocidoEn' | 'mitigadoEn' | 'resueltoEn' | 'silenciadoHasta'
+> & {
   detectadoEn?: string | null;
   reconocidoEn?: string | null;
   mitigadoEn?: string | null;
   resueltoEn?: string | null;
+  silenciadoHasta?: string | null;
 };
 
 type IncidenteFormRawValue = FormValueOf<IIncidente>;
@@ -33,7 +37,7 @@ type NewIncidenteFormRawValue = FormValueOf<NewIncidente>;
 
 type IncidenteFormDefaults = Pick<
   NewIncidente,
-  'id' | 'detectadoEn' | 'reconocidoEn' | 'mitigadoEn' | 'resueltoEn' | 'cumplioObjetivo' | 'servicios'
+  'id' | 'detectadoEn' | 'reconocidoEn' | 'mitigadoEn' | 'resueltoEn' | 'cumplioObjetivo' | 'silenciadoHasta' | 'servicios'
 >;
 
 type IncidenteFormGroupContent = {
@@ -48,6 +52,7 @@ type IncidenteFormGroupContent = {
   resueltoEn: FormControl<IncidenteFormRawValue['resueltoEn']>;
   usuariosAfectados: FormControl<IncidenteFormRawValue['usuariosAfectados']>;
   cumplioObjetivo: FormControl<IncidenteFormRawValue['cumplioObjetivo']>;
+  silenciadoHasta: FormControl<IncidenteFormRawValue['silenciadoHasta']>;
   comandante: FormControl<IncidenteFormRawValue['comandante']>;
   servicios: FormControl<IncidenteFormRawValue['servicios']>;
 };
@@ -92,6 +97,7 @@ export class IncidenteFormService {
         validators: [Validators.min(0)],
       }),
       cumplioObjetivo: new FormControl(incidenteRawValue.cumplioObjetivo),
+      silenciadoHasta: new FormControl(incidenteRawValue.silenciadoHasta),
       comandante: new FormControl(incidenteRawValue.comandante),
       servicios: new FormControl(incidenteRawValue.servicios ?? []),
     });
@@ -119,6 +125,7 @@ export class IncidenteFormService {
       mitigadoEn: currentTime,
       resueltoEn: currentTime,
       cumplioObjetivo: false,
+      silenciadoHasta: currentTime,
       servicios: [],
     };
   }
@@ -130,6 +137,7 @@ export class IncidenteFormService {
       reconocidoEn: dayjs(rawIncidente.reconocidoEn, DATE_TIME_FORMAT),
       mitigadoEn: dayjs(rawIncidente.mitigadoEn, DATE_TIME_FORMAT),
       resueltoEn: dayjs(rawIncidente.resueltoEn, DATE_TIME_FORMAT),
+      silenciadoHasta: dayjs(rawIncidente.silenciadoHasta, DATE_TIME_FORMAT),
     };
   }
 
@@ -142,6 +150,7 @@ export class IncidenteFormService {
       reconocidoEn: incidente.reconocidoEn ? incidente.reconocidoEn.format(DATE_TIME_FORMAT) : undefined,
       mitigadoEn: incidente.mitigadoEn ? incidente.mitigadoEn.format(DATE_TIME_FORMAT) : undefined,
       resueltoEn: incidente.resueltoEn ? incidente.resueltoEn.format(DATE_TIME_FORMAT) : undefined,
+      silenciadoHasta: incidente.silenciadoHasta ? incidente.silenciadoHasta.format(DATE_TIME_FORMAT) : undefined,
       servicios: incidente.servicios ?? [],
     };
   }

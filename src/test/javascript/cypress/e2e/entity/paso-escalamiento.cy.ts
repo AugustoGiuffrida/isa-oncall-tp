@@ -66,6 +66,11 @@ describe('PasoEscalamiento e2e test', () => {
       body: [],
     });
 
+    cy.intercept('GET', '/api/ejecucion-de-escalamientos', {
+      statusCode: 200,
+      body: [],
+    });
+
   });
    */
 

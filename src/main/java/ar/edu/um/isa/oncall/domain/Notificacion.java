@@ -59,7 +59,10 @@ public class Notificacion implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "notificacions" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        allowSetters = true
+    )
     private Incidente incidente;
 
     @ManyToOne(optional = false)

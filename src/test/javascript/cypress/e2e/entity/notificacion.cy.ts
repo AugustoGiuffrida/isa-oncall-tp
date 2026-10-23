@@ -36,7 +36,7 @@ describe('Notificacion e2e test', () => {
     cy.authenticatedRequest({
       method: 'POST',
       url: '/api/incidentes',
-      body: {"titulo":"whoever","descripcion":"instead","severidad":"SEV3","estado":"RESUELTO","detectadoEn":"2023-12-03T23:09:16.966Z","reconocidoEn":"2023-12-04T05:06:30.568Z","mitigadoEn":"2023-12-04T22:04:34.989Z","resueltoEn":"2023-12-04T10:53:47.317Z","usuariosAfectados":17371,"cumplioObjetivo":true},
+      body: {"titulo":"whoever","descripcion":"instead","severidad":"SEV3","estado":"RESUELTO","detectadoEn":"2023-12-03T23:09:16.966Z","reconocidoEn":"2023-12-04T05:06:30.568Z","mitigadoEn":"2023-12-04T22:04:34.989Z","resueltoEn":"2023-12-04T10:53:47.317Z","usuariosAfectados":17371,"cumplioObjetivo":true,"silenciadoHasta":"2023-12-04T16:01:12.630Z"},
     }).then(({ body }) => {
       incidente = body;
     });

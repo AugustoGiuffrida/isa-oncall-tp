@@ -82,11 +82,13 @@ class IncidenteCriteriaTest {
         incidenteCriteria.resueltoEn();
         incidenteCriteria.usuariosAfectados();
         incidenteCriteria.cumplioObjetivo();
+        incidenteCriteria.silenciadoHasta();
         incidenteCriteria.comandanteId();
         incidenteCriteria.servicioId();
         incidenteCriteria.postmortemId();
         incidenteCriteria.alertaId();
         incidenteCriteria.eventoId();
+        incidenteCriteria.ejecucionDeEscalamientoId();
         incidenteCriteria.notificacionId();
         incidenteCriteria.distinct();
     }
@@ -105,11 +107,13 @@ class IncidenteCriteriaTest {
                 condition.apply(criteria.getResueltoEn()) &&
                 condition.apply(criteria.getUsuariosAfectados()) &&
                 condition.apply(criteria.getCumplioObjetivo()) &&
+                condition.apply(criteria.getSilenciadoHasta()) &&
                 condition.apply(criteria.getComandanteId()) &&
                 condition.apply(criteria.getServicioId()) &&
                 condition.apply(criteria.getPostmortemId()) &&
                 condition.apply(criteria.getAlertaId()) &&
                 condition.apply(criteria.getEventoId()) &&
+                condition.apply(criteria.getEjecucionDeEscalamientoId()) &&
                 condition.apply(criteria.getNotificacionId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
@@ -130,11 +134,13 @@ class IncidenteCriteriaTest {
                 condition.apply(criteria.getResueltoEn(), copy.getResueltoEn()) &&
                 condition.apply(criteria.getUsuariosAfectados(), copy.getUsuariosAfectados()) &&
                 condition.apply(criteria.getCumplioObjetivo(), copy.getCumplioObjetivo()) &&
+                condition.apply(criteria.getSilenciadoHasta(), copy.getSilenciadoHasta()) &&
                 condition.apply(criteria.getComandanteId(), copy.getComandanteId()) &&
                 condition.apply(criteria.getServicioId(), copy.getServicioId()) &&
                 condition.apply(criteria.getPostmortemId(), copy.getPostmortemId()) &&
                 condition.apply(criteria.getAlertaId(), copy.getAlertaId()) &&
                 condition.apply(criteria.getEventoId(), copy.getEventoId()) &&
+                condition.apply(criteria.getEjecucionDeEscalamientoId(), copy.getEjecucionDeEscalamientoId()) &&
                 condition.apply(criteria.getNotificacionId(), copy.getNotificacionId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"

@@ -1,5 +1,6 @@
 package ar.edu.um.isa.oncall.web.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -61,6 +62,25 @@ class MetricasDeIncidenteResourceIT {
             .andExpect(jsonPath("$.reconocimiento.minutosObjetivo").value(5))
             .andExpect(jsonPath("$.resolucion.estado").value("EN_CURSO"))
             .andExpect(jsonPath("$.cumplioObjetivo").doesNotExist());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Resolver por el ciclo de vida guarda el veredicto en cumplioObjetivo")
+    void resolverGuardaElVeredicto() throws Exception {
+        Servicio servicio = servicioConObjetivos();
+        Incidente incidente = incidente(servicio, Instant.now().minus(Duration.ofMinutes(10)));
+        incidente.setReconocidoEn(Instant.now().minus(Duration.ofMinutes(9)));
+        em.flush();
+
+        restMockMvc
+            .perform(post("/api/incidentes/{id}/resolver", incidente.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.cumplioObjetivo").value(true));
+
+        em.flush();
+        em.clear();
+        assertThat(em.find(Incidente.class, incidente.getId()).getCumplioObjetivo()).isTrue();
     }
 
     @Test

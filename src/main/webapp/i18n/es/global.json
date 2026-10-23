@@ -21,7 +21,8 @@
         "pasoEscalamiento": "Paso Escalamiento",
         "notificacion": "Notificacion",
         "postmortem": "Postmortem",
-        "accionCorrectiva": "Accion Correctiva"
+        "accionCorrectiva": "Accion Correctiva",
+        "ejecucionDeEscalamiento": "Ejecucion De Escalamiento"
       },
       "account": {
         "main": "Cuenta",

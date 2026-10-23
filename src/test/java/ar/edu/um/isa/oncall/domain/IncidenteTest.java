@@ -1,6 +1,7 @@
 package ar.edu.um.isa.oncall.domain;
 
 import static ar.edu.um.isa.oncall.domain.AlertaTestSamples.*;
+import static ar.edu.um.isa.oncall.domain.EjecucionDeEscalamientoTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.EventoDeIncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.IncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.NotificacionTestSamples.*;
@@ -103,6 +104,28 @@ class IncidenteTest {
         incidente.setEventos(new HashSet<>());
         assertThat(incidente.getEventos()).doesNotContain(eventoDeIncidenteBack);
         assertThat(eventoDeIncidenteBack.getIncidente()).isNull();
+    }
+
+    @Test
+    void ejecucionDeEscalamientoTest() {
+        Incidente incidente = getIncidenteRandomSampleGenerator();
+        EjecucionDeEscalamiento ejecucionDeEscalamientoBack = getEjecucionDeEscalamientoRandomSampleGenerator();
+
+        incidente.addEjecucionDeEscalamiento(ejecucionDeEscalamientoBack);
+        assertThat(incidente.getEjecucionDeEscalamientos()).containsOnly(ejecucionDeEscalamientoBack);
+        assertThat(ejecucionDeEscalamientoBack.getIncidente()).isEqualTo(incidente);
+
+        incidente.removeEjecucionDeEscalamiento(ejecucionDeEscalamientoBack);
+        assertThat(incidente.getEjecucionDeEscalamientos()).doesNotContain(ejecucionDeEscalamientoBack);
+        assertThat(ejecucionDeEscalamientoBack.getIncidente()).isNull();
+
+        incidente.ejecucionDeEscalamientos(new HashSet<>(Set.of(ejecucionDeEscalamientoBack)));
+        assertThat(incidente.getEjecucionDeEscalamientos()).containsOnly(ejecucionDeEscalamientoBack);
+        assertThat(ejecucionDeEscalamientoBack.getIncidente()).isEqualTo(incidente);
+
+        incidente.setEjecucionDeEscalamientos(new HashSet<>());
+        assertThat(incidente.getEjecucionDeEscalamientos()).doesNotContain(ejecucionDeEscalamientoBack);
+        assertThat(ejecucionDeEscalamientoBack.getIncidente()).isNull();
     }
 
     @Test
