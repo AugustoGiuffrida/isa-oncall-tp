@@ -50,6 +50,7 @@ public class TurnoDeGuardiaAsserts {
             .satisfies(a -> assertThat(a.getDesde()).as("check desde").isEqualTo(expected.getDesde()))
             .satisfies(a -> assertThat(a.getHasta()).as("check hasta").isEqualTo(expected.getHasta()))
             .satisfies(a -> assertThat(a.getEsReemplazo()).as("check esReemplazo").isEqualTo(expected.getEsReemplazo()))
+            .satisfies(a -> assertThat(a.getRol()).as("check rol").isEqualTo(expected.getRol()))
             .satisfies(a -> assertThat(a.getNota()).as("check nota").isEqualTo(expected.getNota()));
     }
 

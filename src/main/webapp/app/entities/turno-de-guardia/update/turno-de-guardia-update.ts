@@ -7,6 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Observable, finalize, map } from 'rxjs';
 
+import { RolDeGuardia } from 'app/entities/enumerations/rol-de-guardia.model';
 import { IRotacion } from 'app/entities/rotacion/rotacion.model';
 import { RotacionService } from 'app/entities/rotacion/service/rotacion.service';
 import { UserService } from 'app/entities/user/service/user.service';
@@ -27,6 +28,7 @@ import { TurnoDeGuardiaFormGroup, TurnoDeGuardiaFormService } from './turno-de-g
 export class TurnoDeGuardiaUpdate implements OnInit {
   readonly isSaving = signal(false);
   turnoDeGuardia: ITurnoDeGuardia | null = null;
+  rolDeGuardiaValues = Object.keys(RolDeGuardia);
 
   rotacionsSharedCollection = signal<IRotacion[]>([]);
   usersSharedCollection = signal<IUser[]>([]);

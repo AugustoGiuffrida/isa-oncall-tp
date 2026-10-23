@@ -27,6 +27,12 @@
           <dd>
             <span>{{ turnoDeGuardiaRef.esReemplazo }}</span>
           </dd>
+          <dt><span jhiTranslate="oncallApp.turnoDeGuardia.rol">Rol</span></dt>
+          <dd>
+            <span [jhiTranslate]="'oncallApp.RolDeGuardia.' + (turnoDeGuardiaRef.rol ?? 'null')">{{
+              { null: '', PRIMARIO: 'PRIMARIO', SECUNDARIO: 'SECUNDARIO' }[turnoDeGuardiaRef.rol ?? 'null']
+            }}</span>
+          </dd>
           <dt><span jhiTranslate="oncallApp.turnoDeGuardia.nota">Nota</span></dt>
           <dd>
             <span>{{ turnoDeGuardiaRef.nota }}</span>

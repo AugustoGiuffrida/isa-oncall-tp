@@ -164,6 +164,7 @@ entity TurnoDeGuardia {
   desde Instant required
   hasta Instant required
   esReemplazo Boolean
+  rol RolDeGuardia
   nota String maxlength(255)
 }
 
@@ -188,6 +189,10 @@ entity PasoEscalamiento {
 
 enum TipoRotacion {
   DIARIA, SEMANAL, PERSONALIZADA
+}
+
+enum RolDeGuardia {
+  PRIMARIO, SECUNDARIO
 }
 
 enum Canal {

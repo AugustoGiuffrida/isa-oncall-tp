@@ -61,6 +61,13 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="rol">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.turnoDeGuardia.rol">Rol</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col" jhiSortBy="nota">
               <div class="d-flex">
                 <span jhiTranslate="oncallApp.turnoDeGuardia.nota">Nota</span>
@@ -92,6 +99,9 @@
               <td>{{ turnoDeGuardia.desde | formatMediumDatetime }}</td>
               <td>{{ turnoDeGuardia.hasta | formatMediumDatetime }}</td>
               <td>{{ turnoDeGuardia.esReemplazo }}</td>
+              <td [jhiTranslate]="'oncallApp.RolDeGuardia.' + (turnoDeGuardia.rol ?? 'null')">
+                {{ { null: '', PRIMARIO: 'PRIMARIO', SECUNDARIO: 'SECUNDARIO' }[turnoDeGuardia.rol ?? 'null'] }}
+              </td>
               <td>{{ turnoDeGuardia.nota }}</td>
               <td>
                 @if (turnoDeGuardia.rotacion) {

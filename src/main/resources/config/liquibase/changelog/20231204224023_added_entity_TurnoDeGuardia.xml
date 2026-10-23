@@ -23,6 +23,9 @@
             <column name="es_reemplazo" type="boolean">
                 <constraints nullable="true" />
             </column>
+            <column name="rol" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="nota" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
@@ -59,6 +62,7 @@
             <column name="desde" type="date"/>
             <column name="hasta" type="date"/>
             <column name="es_reemplazo" type="boolean"/>
+            <column name="rol" type="string"/>
             <column name="nota" type="string"/>
             <column name="rotacion_id" type="numeric"/>
             <column name="responsable_id" type="numeric"/>

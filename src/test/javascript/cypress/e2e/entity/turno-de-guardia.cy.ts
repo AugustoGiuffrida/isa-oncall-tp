@@ -14,7 +14,7 @@ describe('TurnoDeGuardia e2e test', () => {
   const turnoDeGuardiaPageUrl = '/turno-de-guardia';
   let username: string;
   let password: string;
-  // const turnoDeGuardiaSample = {"desde":"2023-12-04T00:07:34.228Z","hasta":"2023-12-04T04:29:52.820Z"};
+  // const turnoDeGuardiaSample = {"desde":"2023-12-03T23:12:58.414Z","hasta":"2023-12-04T08:47:03.482Z"};
 
   let turnoDeGuardia;
   // let rotacion;
@@ -260,8 +260,10 @@ describe('TurnoDeGuardia e2e test', () => {
       cy.get(`[data-cy="esReemplazo"]`).click();
       cy.get(`[data-cy="esReemplazo"]`).should('be.checked');
 
-      cy.get(`[data-cy="nota"]`).type('piglet sprinkles');
-      cy.get(`[data-cy="nota"]`).should('have.value', 'piglet sprinkles');
+      cy.get(`[data-cy="rol"]`).select('SECUNDARIO');
+
+      cy.get(`[data-cy="nota"]`).type('till');
+      cy.get(`[data-cy="nota"]`).should('have.value', 'till');
 
       cy.get(`[data-cy="rotacion"]`).select(1);
       cy.get(`[data-cy="responsable"]`).select(1);

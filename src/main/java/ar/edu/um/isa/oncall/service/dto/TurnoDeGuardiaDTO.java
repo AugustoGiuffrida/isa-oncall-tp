@@ -1,5 +1,6 @@
 package ar.edu.um.isa.oncall.service.dto;
 
+import ar.edu.um.isa.oncall.domain.enumeration.RolDeGuardia;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -22,6 +23,8 @@ public class TurnoDeGuardiaDTO implements Serializable {
     private Instant hasta;
 
     private Boolean esReemplazo;
+
+    private RolDeGuardia rol;
 
     @Size(max = 255)
     private String nota;
@@ -62,6 +65,14 @@ public class TurnoDeGuardiaDTO implements Serializable {
 
     public void setEsReemplazo(Boolean esReemplazo) {
         this.esReemplazo = esReemplazo;
+    }
+
+    public RolDeGuardia getRol() {
+        return rol;
+    }
+
+    public void setRol(RolDeGuardia rol) {
+        this.rol = rol;
     }
 
     public String getNota() {
@@ -117,6 +128,7 @@ public class TurnoDeGuardiaDTO implements Serializable {
             ", desde='" + getDesde() + "'" +
             ", hasta='" + getHasta() + "'" +
             ", esReemplazo='" + getEsReemplazo() + "'" +
+            ", rol='" + getRol() + "'" +
             ", nota='" + getNota() + "'" +
             ", rotacion=" + getRotacion() +
             ", responsable=" + getResponsable() +

@@ -12,6 +12,7 @@ import ar.edu.um.isa.oncall.IntegrationTest;
 import ar.edu.um.isa.oncall.domain.Rotacion;
 import ar.edu.um.isa.oncall.domain.TurnoDeGuardia;
 import ar.edu.um.isa.oncall.domain.User;
+import ar.edu.um.isa.oncall.domain.enumeration.RolDeGuardia;
 import ar.edu.um.isa.oncall.repository.TurnoDeGuardiaRepository;
 import ar.edu.um.isa.oncall.repository.UserRepository;
 import ar.edu.um.isa.oncall.service.TurnoDeGuardiaService;
@@ -55,6 +56,9 @@ class TurnoDeGuardiaResourceIT {
 
     private static final Boolean DEFAULT_ES_REEMPLAZO = false;
     private static final Boolean UPDATED_ES_REEMPLAZO = true;
+
+    private static final RolDeGuardia DEFAULT_ROL = RolDeGuardia.PRIMARIO;
+    private static final RolDeGuardia UPDATED_ROL = RolDeGuardia.SECUNDARIO;
 
     private static final String DEFAULT_NOTA = "AAAAAAAAAA";
     private static final String UPDATED_NOTA = "BBBBBBBBBB";
@@ -104,6 +108,7 @@ class TurnoDeGuardiaResourceIT {
             .desde(DEFAULT_DESDE)
             .hasta(DEFAULT_HASTA)
             .esReemplazo(DEFAULT_ES_REEMPLAZO)
+            .rol(DEFAULT_ROL)
             .nota(DEFAULT_NOTA);
         // Add required entity
         Rotacion rotacion;
@@ -134,6 +139,7 @@ class TurnoDeGuardiaResourceIT {
             .desde(UPDATED_DESDE)
             .hasta(UPDATED_HASTA)
             .esReemplazo(UPDATED_ES_REEMPLAZO)
+            .rol(UPDATED_ROL)
             .nota(UPDATED_NOTA);
         // Add required entity
         Rotacion rotacion;
@@ -257,6 +263,7 @@ class TurnoDeGuardiaResourceIT {
             .andExpect(jsonPath("$.[*].desde").value(hasItem(DEFAULT_DESDE.toString())))
             .andExpect(jsonPath("$.[*].hasta").value(hasItem(DEFAULT_HASTA.toString())))
             .andExpect(jsonPath("$.[*].esReemplazo").value(hasItem(DEFAULT_ES_REEMPLAZO)))
+            .andExpect(jsonPath("$.[*].rol").value(hasItem(DEFAULT_ROL.toString())))
             .andExpect(jsonPath("$.[*].nota").value(hasItem(DEFAULT_NOTA)));
     }
 
@@ -292,6 +299,7 @@ class TurnoDeGuardiaResourceIT {
             .andExpect(jsonPath("$.desde").value(DEFAULT_DESDE.toString()))
             .andExpect(jsonPath("$.hasta").value(DEFAULT_HASTA.toString()))
             .andExpect(jsonPath("$.esReemplazo").value(DEFAULT_ES_REEMPLAZO))
+            .andExpect(jsonPath("$.rol").value(DEFAULT_ROL.toString()))
             .andExpect(jsonPath("$.nota").value(DEFAULT_NOTA));
     }
 
@@ -314,7 +322,12 @@ class TurnoDeGuardiaResourceIT {
         TurnoDeGuardia updatedTurnoDeGuardia = turnoDeGuardiaRepository.findById(turnoDeGuardia.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedTurnoDeGuardia are not directly saved in db
         em.detach(updatedTurnoDeGuardia);
-        updatedTurnoDeGuardia.desde(UPDATED_DESDE).hasta(UPDATED_HASTA).esReemplazo(UPDATED_ES_REEMPLAZO).nota(UPDATED_NOTA);
+        updatedTurnoDeGuardia
+            .desde(UPDATED_DESDE)
+            .hasta(UPDATED_HASTA)
+            .esReemplazo(UPDATED_ES_REEMPLAZO)
+            .rol(UPDATED_ROL)
+            .nota(UPDATED_NOTA);
         TurnoDeGuardiaDTO turnoDeGuardiaDTO = turnoDeGuardiaMapper.toDto(updatedTurnoDeGuardia);
 
         restTurnoDeGuardiaMockMvc
@@ -435,7 +448,12 @@ class TurnoDeGuardiaResourceIT {
         TurnoDeGuardia partialUpdatedTurnoDeGuardia = new TurnoDeGuardia();
         partialUpdatedTurnoDeGuardia.setId(turnoDeGuardia.getId());
 
-        partialUpdatedTurnoDeGuardia.desde(UPDATED_DESDE).hasta(UPDATED_HASTA).esReemplazo(UPDATED_ES_REEMPLAZO).nota(UPDATED_NOTA);
+        partialUpdatedTurnoDeGuardia
+            .desde(UPDATED_DESDE)
+            .hasta(UPDATED_HASTA)
+            .esReemplazo(UPDATED_ES_REEMPLAZO)
+            .rol(UPDATED_ROL)
+            .nota(UPDATED_NOTA);
 
         restTurnoDeGuardiaMockMvc
             .perform(

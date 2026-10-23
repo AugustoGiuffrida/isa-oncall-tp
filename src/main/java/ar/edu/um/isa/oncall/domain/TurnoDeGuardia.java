@@ -1,5 +1,6 @@
 package ar.edu.um.isa.oncall.domain;
 
+import ar.edu.um.isa.oncall.domain.enumeration.RolDeGuardia;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -37,6 +38,10 @@ public class TurnoDeGuardia implements Serializable {
 
     @Column(name = "es_reemplazo")
     private Boolean esReemplazo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol")
+    private RolDeGuardia rol;
 
     @Size(max = 255)
     @Column(name = "nota", length = 255)
@@ -105,6 +110,19 @@ public class TurnoDeGuardia implements Serializable {
         this.esReemplazo = esReemplazo;
     }
 
+    public RolDeGuardia getRol() {
+        return this.rol;
+    }
+
+    public TurnoDeGuardia rol(RolDeGuardia rol) {
+        this.setRol(rol);
+        return this;
+    }
+
+    public void setRol(RolDeGuardia rol) {
+        this.rol = rol;
+    }
+
     public String getNota() {
         return this.nota;
     }
@@ -171,6 +189,7 @@ public class TurnoDeGuardia implements Serializable {
             ", desde='" + getDesde() + "'" +
             ", hasta='" + getHasta() + "'" +
             ", esReemplazo='" + getEsReemplazo() + "'" +
+            ", rol='" + getRol() + "'" +
             ", nota='" + getNota() + "'" +
             "}";
     }

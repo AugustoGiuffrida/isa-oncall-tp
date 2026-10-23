@@ -36,6 +36,7 @@ type TurnoDeGuardiaFormGroupContent = {
   desde: FormControl<TurnoDeGuardiaFormRawValue['desde']>;
   hasta: FormControl<TurnoDeGuardiaFormRawValue['hasta']>;
   esReemplazo: FormControl<TurnoDeGuardiaFormRawValue['esReemplazo']>;
+  rol: FormControl<TurnoDeGuardiaFormRawValue['rol']>;
   nota: FormControl<TurnoDeGuardiaFormRawValue['nota']>;
   rotacion: FormControl<TurnoDeGuardiaFormRawValue['rotacion']>;
   responsable: FormControl<TurnoDeGuardiaFormRawValue['responsable']>;
@@ -66,6 +67,7 @@ export class TurnoDeGuardiaFormService {
         validators: [Validators.required],
       }),
       esReemplazo: new FormControl(turnoDeGuardiaRawValue.esReemplazo),
+      rol: new FormControl(turnoDeGuardiaRawValue.rol),
       nota: new FormControl(turnoDeGuardiaRawValue.nota, {
         validators: [Validators.maxLength(255)],
       }),

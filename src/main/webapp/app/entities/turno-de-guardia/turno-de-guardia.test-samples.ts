@@ -9,11 +9,11 @@ export const sampleWithRequiredData: ITurnoDeGuardia = {
 };
 
 export const sampleWithPartialData: ITurnoDeGuardia = {
-  id: 17893,
-  desde: dayjs('2023-12-04T03:14'),
-  hasta: dayjs('2023-12-03T22:58'),
-  esReemplazo: false,
-  nota: 'on',
+  id: 6248,
+  desde: dayjs('2023-12-03T22:58'),
+  hasta: dayjs('2023-12-04T19:30'),
+  esReemplazo: true,
+  rol: 'PRIMARIO',
 };
 
 export const sampleWithFullData: ITurnoDeGuardia = {
@@ -21,7 +21,8 @@ export const sampleWithFullData: ITurnoDeGuardia = {
   desde: dayjs('2023-12-04T14:21'),
   hasta: dayjs('2023-12-04T14:23'),
   esReemplazo: true,
-  nota: 'suddenly now',
+  rol: 'PRIMARIO',
+  nota: 'sanity zowie',
 };
 
 export const sampleWithNewData: NewTurnoDeGuardia = {

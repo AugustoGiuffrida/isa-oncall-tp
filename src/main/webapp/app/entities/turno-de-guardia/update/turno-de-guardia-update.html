@@ -83,6 +83,16 @@
           />
         </div>
 
+        <div class="mb-3">
+          <label class="form-label" for="field_rol" jhiTranslate="oncallApp.turnoDeGuardia.rol">Rol</label>
+          <select class="form-control" name="rol" formControlName="rol" id="field_rol" data-cy="rol">
+            <option [ngValue]="null">{{ 'oncallApp.RolDeGuardia.null' | translate }}</option>
+            @for (rolDeGuardia of rolDeGuardiaValues; track $index) {
+              <option [value]="rolDeGuardia">{{ 'oncallApp.RolDeGuardia.' + rolDeGuardia | translate }}</option>
+            }
+          </select>
+        </div>
+
         @let notaRef = editForm.get('nota')!;
         <div class="mb-3">
           <label class="form-label" for="field_nota" jhiTranslate="oncallApp.turnoDeGuardia.nota">Nota</label>
