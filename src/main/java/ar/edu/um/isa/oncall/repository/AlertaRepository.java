@@ -27,14 +27,18 @@ public interface AlertaRepository extends JpaRepository<Alerta, Long>, JpaSpecif
     }
 
     @Query(
-        value = "select alerta from Alerta alerta left join fetch alerta.servicio left join fetch alerta.incidente",
+        value = "select alerta from Alerta alerta left join fetch alerta.servicio left join fetch alerta.incidente left join fetch alerta.suprimidaPor",
         countQuery = "select count(alerta) from Alerta alerta"
     )
     Page<Alerta> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select alerta from Alerta alerta left join fetch alerta.servicio left join fetch alerta.incidente")
+    @Query(
+        "select alerta from Alerta alerta left join fetch alerta.servicio left join fetch alerta.incidente left join fetch alerta.suprimidaPor"
+    )
     List<Alerta> findAllWithToOneRelationships();
 
-    @Query("select alerta from Alerta alerta left join fetch alerta.servicio left join fetch alerta.incidente where alerta.id =:id")
+    @Query(
+        "select alerta from Alerta alerta left join fetch alerta.servicio left join fetch alerta.incidente left join fetch alerta.suprimidaPor where alerta.id =:id"
+    )
     Optional<Alerta> findOneWithToOneRelationships(@Param("id") Long id);
 }

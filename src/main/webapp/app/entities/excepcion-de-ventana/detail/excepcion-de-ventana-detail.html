@@ -1,0 +1,64 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (excepcionDeVentana(); as excepcionDeVentanaRef) {
+      <div>
+        <h2 data-cy="excepcionDeVentanaDetailsHeading">
+          <span jhiTranslate="oncallApp.excepcionDeVentana.detail.title">Excepcion De Ventana</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ excepcionDeVentanaRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.excepcionDeVentana.fecha">Fecha</span></dt>
+          <dd>
+            <span>{{ excepcionDeVentanaRef.fecha | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.excepcionDeVentana.tipo">Tipo</span></dt>
+          <dd>
+            <span [jhiTranslate]="'oncallApp.TipoExcepcionDeVentana.' + (excepcionDeVentanaRef.tipo ?? 'null')">{{
+              { null: '', CANCELADA: 'CANCELADA', REPROGRAMADA: 'REPROGRAMADA' }[excepcionDeVentanaRef.tipo ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.excepcionDeVentana.nuevoDesde">Nuevo Desde</span></dt>
+          <dd>
+            <span>{{ excepcionDeVentanaRef.nuevoDesde | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.excepcionDeVentana.nuevoHasta">Nuevo Hasta</span></dt>
+          <dd>
+            <span>{{ excepcionDeVentanaRef.nuevoHasta | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.excepcionDeVentana.motivo">Motivo</span></dt>
+          <dd>
+            <span>{{ excepcionDeVentanaRef.motivo }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.excepcionDeVentana.ventana">Ventana</span></dt>
+          <dd>
+            @if (excepcionDeVentana()!.ventana) {
+              <div>
+                <a [routerLink]="['/ventana-de-mantenimiento', excepcionDeVentana()!.ventana?.id, 'view']">{{
+                  excepcionDeVentanaRef.ventana?.nombre
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/excepcion-de-ventana', excepcionDeVentanaRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

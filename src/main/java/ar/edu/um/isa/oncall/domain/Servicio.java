@@ -69,13 +69,18 @@ public class Servicio implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "servicio")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "servicio", "incidente" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "servicio", "incidente", "suprimidaPor" }, allowSetters = true)
     private Set<Alerta> alertas = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "servicio")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "servicio", "pasos" }, allowSetters = true)
     private Set<PoliticaEscalamiento> politicas = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "servicio")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "ventana", "servicio" }, allowSetters = true)
+    private Set<ServicioEnVentana> ventanas = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "servicios")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -281,6 +286,37 @@ public class Servicio implements Serializable {
     public Servicio removePolitica(PoliticaEscalamiento politicaEscalamiento) {
         this.politicas.remove(politicaEscalamiento);
         politicaEscalamiento.setServicio(null);
+        return this;
+    }
+
+    public Set<ServicioEnVentana> getVentanas() {
+        return this.ventanas;
+    }
+
+    public void setVentanas(Set<ServicioEnVentana> servicioEnVentanas) {
+        if (this.ventanas != null) {
+            this.ventanas.forEach(i -> i.setServicio(null));
+        }
+        if (servicioEnVentanas != null) {
+            servicioEnVentanas.forEach(i -> i.setServicio(this));
+        }
+        this.ventanas = servicioEnVentanas;
+    }
+
+    public Servicio ventanas(Set<ServicioEnVentana> servicioEnVentanas) {
+        this.setVentanas(servicioEnVentanas);
+        return this;
+    }
+
+    public Servicio addVentana(ServicioEnVentana servicioEnVentana) {
+        this.ventanas.add(servicioEnVentana);
+        servicioEnVentana.setServicio(this);
+        return this;
+    }
+
+    public Servicio removeVentana(ServicioEnVentana servicioEnVentana) {
+        this.ventanas.remove(servicioEnVentana);
+        servicioEnVentana.setServicio(null);
         return this;
     }
 

@@ -64,6 +64,14 @@
               </div>
             }
           </dd>
+          <dt><span jhiTranslate="oncallApp.alerta.suprimidaPor">Suprimida Por</span></dt>
+          <dd>
+            @if (alerta()!.suprimidaPor) {
+              <div>
+                <a [routerLink]="['/ventana-de-mantenimiento', alerta()!.suprimidaPor?.id, 'view']">{{ alertaRef.suprimidaPor?.nombre }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

@@ -96,6 +96,12 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="suprimidaPor.nombre">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.alerta.suprimidaPor">Suprimida Por</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -133,6 +139,13 @@
                 @if (alerta.incidente) {
                   <div>
                     <a [routerLink]="['/incidente', alerta.incidente.id, 'view']">{{ alerta.incidente.titulo }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (alerta.suprimidaPor) {
+                  <div>
+                    <a [routerLink]="['/ventana-de-mantenimiento', alerta.suprimidaPor.id, 'view']">{{ alerta.suprimidaPor.nombre }}</a>
                   </div>
                 }
               </td>

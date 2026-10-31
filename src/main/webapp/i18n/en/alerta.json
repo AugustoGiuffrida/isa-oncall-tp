@@ -25,7 +25,8 @@
       "recibidaEn": "Recibida En",
       "procesada": "Procesada",
       "servicio": "Servicio",
-      "incidente": "Incidente"
+      "incidente": "Incidente",
+      "suprimidaPor": "Suprimida Por"
     }
   }
 }

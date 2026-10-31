@@ -26,7 +26,10 @@
       "Notificacion",
       "Postmortem",
       "AccionCorrectiva",
-      "EjecucionDeEscalamiento"
+      "EjecucionDeEscalamiento",
+      "VentanaDeMantenimiento",
+      "ServicioEnVentana",
+      "ExcepcionDeVentana"
     ],
     "jhipsterVersion": "9.2.0",
     "jwtSecretKey": "MzUzMTJkOGZkOTc2N2FhMWY4Y2I2YzgxMTA4MmRhNWEyYjY1ZDMyY2VlMDlkMmYwNDE0NjQ2MWE1YzhjZDNjOWYwYzg1M2M1ZGU4N2JhNDYyMWY0NGQ0MjMwMjdhMGE3YTZiMzNlNmM1ODU1YTA0M2IwZmI5NGJmZjkzMDgwZmI=",

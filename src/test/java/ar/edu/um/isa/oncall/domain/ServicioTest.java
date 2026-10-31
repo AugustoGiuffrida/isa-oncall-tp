@@ -5,6 +5,7 @@ import static ar.edu.um.isa.oncall.domain.EquipoTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.IncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.ObjetivoDeServicioTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.PoliticaEscalamientoTestSamples.*;
+import static ar.edu.um.isa.oncall.domain.ServicioEnVentanaTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.ServicioTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -105,6 +106,28 @@ class ServicioTest {
         servicio.setPoliticas(new HashSet<>());
         assertThat(servicio.getPoliticas()).doesNotContain(politicaEscalamientoBack);
         assertThat(politicaEscalamientoBack.getServicio()).isNull();
+    }
+
+    @Test
+    void ventanaTest() {
+        Servicio servicio = getServicioRandomSampleGenerator();
+        ServicioEnVentana servicioEnVentanaBack = getServicioEnVentanaRandomSampleGenerator();
+
+        servicio.addVentana(servicioEnVentanaBack);
+        assertThat(servicio.getVentanas()).containsOnly(servicioEnVentanaBack);
+        assertThat(servicioEnVentanaBack.getServicio()).isEqualTo(servicio);
+
+        servicio.removeVentana(servicioEnVentanaBack);
+        assertThat(servicio.getVentanas()).doesNotContain(servicioEnVentanaBack);
+        assertThat(servicioEnVentanaBack.getServicio()).isNull();
+
+        servicio.ventanas(new HashSet<>(Set.of(servicioEnVentanaBack)));
+        assertThat(servicio.getVentanas()).containsOnly(servicioEnVentanaBack);
+        assertThat(servicioEnVentanaBack.getServicio()).isEqualTo(servicio);
+
+        servicio.setVentanas(new HashSet<>());
+        assertThat(servicio.getVentanas()).doesNotContain(servicioEnVentanaBack);
+        assertThat(servicioEnVentanaBack.getServicio()).isNull();
     }
 
     @Test

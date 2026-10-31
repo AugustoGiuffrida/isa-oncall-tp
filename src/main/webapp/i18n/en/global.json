@@ -22,7 +22,10 @@
         "notificacion": "Notificacion",
         "postmortem": "Postmortem",
         "accionCorrectiva": "Accion Correctiva",
-        "ejecucionDeEscalamiento": "Ejecucion De Escalamiento"
+        "ejecucionDeEscalamiento": "Ejecucion De Escalamiento",
+        "ventanaDeMantenimiento": "Ventana De Mantenimiento",
+        "servicioEnVentana": "Servicio En Ventana",
+        "excepcionDeVentana": "Excepcion De Ventana"
       },
       "account": {
         "main": "Account",

@@ -59,7 +59,7 @@ public class Alerta implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "incidentes" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "ventanas", "incidentes" }, allowSetters = true)
     private Servicio servicio;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,6 +68,10 @@ public class Alerta implements Serializable {
         allowSetters = true
     )
     private Incidente incidente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "servicios", "excepcions", "alertaSuprimidas" }, allowSetters = true)
+    private VentanaDeMantenimiento suprimidaPor;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -185,6 +189,19 @@ public class Alerta implements Serializable {
 
     public Alerta incidente(Incidente incidente) {
         this.setIncidente(incidente);
+        return this;
+    }
+
+    public VentanaDeMantenimiento getSuprimidaPor() {
+        return this.suprimidaPor;
+    }
+
+    public void setSuprimidaPor(VentanaDeMantenimiento ventanaDeMantenimiento) {
+        this.suprimidaPor = ventanaDeMantenimiento;
+    }
+
+    public Alerta suprimidaPor(VentanaDeMantenimiento ventanaDeMantenimiento) {
+        this.setSuprimidaPor(ventanaDeMantenimiento);
         return this;
     }
 

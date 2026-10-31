@@ -82,6 +82,7 @@ class ServicioCriteriaTest {
         servicioCriteria.objetivoId();
         servicioCriteria.alertaId();
         servicioCriteria.politicaId();
+        servicioCriteria.ventanaId();
         servicioCriteria.incidenteId();
         servicioCriteria.distinct();
     }
@@ -100,6 +101,7 @@ class ServicioCriteriaTest {
                 condition.apply(criteria.getObjetivoId()) &&
                 condition.apply(criteria.getAlertaId()) &&
                 condition.apply(criteria.getPoliticaId()) &&
+                condition.apply(criteria.getVentanaId()) &&
                 condition.apply(criteria.getIncidenteId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
@@ -120,6 +122,7 @@ class ServicioCriteriaTest {
                 condition.apply(criteria.getObjetivoId(), copy.getObjetivoId()) &&
                 condition.apply(criteria.getAlertaId(), copy.getAlertaId()) &&
                 condition.apply(criteria.getPoliticaId(), copy.getPoliticaId()) &&
+                condition.apply(criteria.getVentanaId(), copy.getVentanaId()) &&
                 condition.apply(criteria.getIncidenteId(), copy.getIncidenteId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"

@@ -82,6 +82,8 @@ public class ServicioCriteria implements Serializable, Criteria {
 
     private LongFilter politicaId;
 
+    private LongFilter ventanaId;
+
     private LongFilter incidenteId;
 
     private Boolean distinct;
@@ -100,6 +102,7 @@ public class ServicioCriteria implements Serializable, Criteria {
         this.objetivoId = other.optionalObjetivoId().map(LongFilter::copy).orElse(null);
         this.alertaId = other.optionalAlertaId().map(LongFilter::copy).orElse(null);
         this.politicaId = other.optionalPoliticaId().map(LongFilter::copy).orElse(null);
+        this.ventanaId = other.optionalVentanaId().map(LongFilter::copy).orElse(null);
         this.incidenteId = other.optionalIncidenteId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -318,6 +321,25 @@ public class ServicioCriteria implements Serializable, Criteria {
         this.politicaId = politicaId;
     }
 
+    public LongFilter getVentanaId() {
+        return ventanaId;
+    }
+
+    public Optional<LongFilter> optionalVentanaId() {
+        return Optional.ofNullable(ventanaId);
+    }
+
+    public LongFilter ventanaId() {
+        if (ventanaId == null) {
+            setVentanaId(new LongFilter());
+        }
+        return ventanaId;
+    }
+
+    public void setVentanaId(LongFilter ventanaId) {
+        this.ventanaId = ventanaId;
+    }
+
     public LongFilter getIncidenteId() {
         return incidenteId;
     }
@@ -377,6 +399,7 @@ public class ServicioCriteria implements Serializable, Criteria {
             Objects.equals(objetivoId, that.objetivoId) &&
             Objects.equals(alertaId, that.alertaId) &&
             Objects.equals(politicaId, that.politicaId) &&
+            Objects.equals(ventanaId, that.ventanaId) &&
             Objects.equals(incidenteId, that.incidenteId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -396,6 +419,7 @@ public class ServicioCriteria implements Serializable, Criteria {
             objetivoId,
             alertaId,
             politicaId,
+            ventanaId,
             incidenteId,
             distinct
         );
@@ -416,6 +440,7 @@ public class ServicioCriteria implements Serializable, Criteria {
             optionalObjetivoId().map(f -> "objetivoId=" + f + ", ").orElse("") +
             optionalAlertaId().map(f -> "alertaId=" + f + ", ").orElse("") +
             optionalPoliticaId().map(f -> "politicaId=" + f + ", ").orElse("") +
+            optionalVentanaId().map(f -> "ventanaId=" + f + ", ").orElse("") +
             optionalIncidenteId().map(f -> "incidenteId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";

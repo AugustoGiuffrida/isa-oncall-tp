@@ -1,0 +1,34 @@
+{
+  "oncallApp": {
+    "ventanaDeMantenimiento": {
+      "home": {
+        "title": "Ventana De Mantenimientos",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Ventana De Mantenimiento",
+        "createOrEditLabel": "Crear o editar Ventana De Mantenimiento",
+        "notFound": "Ningún Ventana De Mantenimientos encontrado"
+      },
+      "created": "Un nuevo Ventana De Mantenimiento ha sido creado con el identificador {{ param }}",
+      "updated": "Un Ventana De Mantenimiento ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Ventana De Mantenimiento ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Ventana De Mantenimiento {{ id }}?"
+      },
+      "detail": {
+        "title": "Ventana De Mantenimiento"
+      },
+      "id": "ID",
+      "nombre": "Nombre",
+      "descripcion": "Descripcion",
+      "desde": "Desde",
+      "hasta": "Hasta",
+      "recurrencia": "Recurrencia",
+      "zonaHoraria": "Zona Horaria",
+      "repetirHasta": "Repetir Hasta",
+      "activa": "Activa",
+      "servicio": "Servicio",
+      "excepcion": "Excepcion",
+      "alertaSuprimida": "Alerta Suprimida"
+    }
+  }
+}

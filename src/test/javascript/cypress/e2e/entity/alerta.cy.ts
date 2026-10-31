@@ -61,6 +61,11 @@ describe('Alerta e2e test', () => {
       body: [],
     });
 
+    cy.intercept('GET', '/api/ventana-de-mantenimientos', {
+      statusCode: 200,
+      body: [],
+    });
+
   });
    */
 

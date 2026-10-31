@@ -1,0 +1,10 @@
+{
+  "oncallApp": {
+    "Recurrencia": {
+      "null": "",
+      "UNICA": "UNICA",
+      "DIARIA": "DIARIA",
+      "SEMANAL": "SEMANAL"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (ventanaDeMantenimiento(); as ventanaDeMantenimientoRef) {
+      <div>
+        <h2 data-cy="ventanaDeMantenimientoDetailsHeading">
+          <span jhiTranslate="oncallApp.ventanaDeMantenimiento.detail.title">Ventana De Mantenimiento</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.nombre">Nombre</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.nombre }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.descripcion">Descripcion</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.descripcion }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.desde">Desde</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.desde | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.hasta">Hasta</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.hasta | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.recurrencia">Recurrencia</span></dt>
+          <dd>
+            <span [jhiTranslate]="'oncallApp.Recurrencia.' + (ventanaDeMantenimientoRef.recurrencia ?? 'null')">{{
+              { null: '', UNICA: 'UNICA', DIARIA: 'DIARIA', SEMANAL: 'SEMANAL' }[ventanaDeMantenimientoRef.recurrencia ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.zonaHoraria">Zona Horaria</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.zonaHoraria }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.repetirHasta">Repetir Hasta</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.repetirHasta | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.ventanaDeMantenimiento.activa">Activa</span></dt>
+          <dd>
+            <span>{{ ventanaDeMantenimientoRef.activa }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/ventana-de-mantenimiento', ventanaDeMantenimientoRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -65,6 +65,7 @@ public class AlertaAsserts {
         assertThat(actual)
             .as("Verify Alerta relationships")
             .satisfies(a -> assertThat(a.getServicio()).as("check servicio").isEqualTo(expected.getServicio()))
-            .satisfies(a -> assertThat(a.getIncidente()).as("check incidente").isEqualTo(expected.getIncidente()));
+            .satisfies(a -> assertThat(a.getIncidente()).as("check incidente").isEqualTo(expected.getIncidente()))
+            .satisfies(a -> assertThat(a.getSuprimidaPor()).as("check suprimidaPor").isEqualTo(expected.getSuprimidaPor()));
     }
 }

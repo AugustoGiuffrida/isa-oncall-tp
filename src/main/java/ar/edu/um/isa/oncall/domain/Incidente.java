@@ -84,7 +84,7 @@ public class Incidente implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "servicio_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "incidentes" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "ventanas", "incidentes" }, allowSetters = true)
     private Set<Servicio> servicios = new HashSet<>();
 
     @JsonIgnoreProperties(value = { "incidente", "accions" }, allowSetters = true)
@@ -93,7 +93,7 @@ public class Incidente implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "incidente")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "servicio", "incidente" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "servicio", "incidente", "suprimidaPor" }, allowSetters = true)
     private Set<Alerta> alertas = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "incidente")

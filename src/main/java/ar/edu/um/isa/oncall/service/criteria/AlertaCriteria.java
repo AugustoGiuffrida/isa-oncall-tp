@@ -60,6 +60,8 @@ public class AlertaCriteria implements Serializable, Criteria {
 
     private LongFilter incidenteId;
 
+    private LongFilter suprimidaPorId;
+
     private Boolean distinct;
 
     public AlertaCriteria() {}
@@ -74,6 +76,7 @@ public class AlertaCriteria implements Serializable, Criteria {
         this.procesada = other.optionalProcesada().map(BooleanFilter::copy).orElse(null);
         this.servicioId = other.optionalServicioId().map(LongFilter::copy).orElse(null);
         this.incidenteId = other.optionalIncidenteId().map(LongFilter::copy).orElse(null);
+        this.suprimidaPorId = other.optionalSuprimidaPorId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -253,6 +256,25 @@ public class AlertaCriteria implements Serializable, Criteria {
         this.incidenteId = incidenteId;
     }
 
+    public LongFilter getSuprimidaPorId() {
+        return suprimidaPorId;
+    }
+
+    public Optional<LongFilter> optionalSuprimidaPorId() {
+        return Optional.ofNullable(suprimidaPorId);
+    }
+
+    public LongFilter suprimidaPorId() {
+        if (suprimidaPorId == null) {
+            setSuprimidaPorId(new LongFilter());
+        }
+        return suprimidaPorId;
+    }
+
+    public void setSuprimidaPorId(LongFilter suprimidaPorId) {
+        this.suprimidaPorId = suprimidaPorId;
+    }
+
     public Boolean getDistinct() {
         return distinct;
     }
@@ -291,13 +313,26 @@ public class AlertaCriteria implements Serializable, Criteria {
             Objects.equals(procesada, that.procesada) &&
             Objects.equals(servicioId, that.servicioId) &&
             Objects.equals(incidenteId, that.incidenteId) &&
+            Objects.equals(suprimidaPorId, that.suprimidaPorId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fingerprint, origen, resumen, payload, recibidaEn, procesada, servicioId, incidenteId, distinct);
+        return Objects.hash(
+            id,
+            fingerprint,
+            origen,
+            resumen,
+            payload,
+            recibidaEn,
+            procesada,
+            servicioId,
+            incidenteId,
+            suprimidaPorId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -313,6 +348,7 @@ public class AlertaCriteria implements Serializable, Criteria {
             optionalProcesada().map(f -> "procesada=" + f + ", ").orElse("") +
             optionalServicioId().map(f -> "servicioId=" + f + ", ").orElse("") +
             optionalIncidenteId().map(f -> "incidenteId=" + f + ", ").orElse("") +
+            optionalSuprimidaPorId().map(f -> "suprimidaPorId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

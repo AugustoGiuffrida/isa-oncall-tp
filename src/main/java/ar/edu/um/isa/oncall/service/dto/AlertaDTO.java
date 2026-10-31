@@ -43,6 +43,8 @@ public class AlertaDTO implements Serializable {
 
     private IncidenteDTO incidente;
 
+    private VentanaDeMantenimientoDTO suprimidaPor;
+
     public Long getId() {
         return id;
     }
@@ -115,6 +117,14 @@ public class AlertaDTO implements Serializable {
         this.incidente = incidente;
     }
 
+    public VentanaDeMantenimientoDTO getSuprimidaPor() {
+        return suprimidaPor;
+    }
+
+    public void setSuprimidaPor(VentanaDeMantenimientoDTO suprimidaPor) {
+        this.suprimidaPor = suprimidaPor;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -149,6 +159,7 @@ public class AlertaDTO implements Serializable {
             ", procesada='" + getProcesada() + "'" +
             ", servicio=" + getServicio() +
             ", incidente=" + getIncidente() +
+            ", suprimidaPor=" + getSuprimidaPor() +
             "}";
     }
 }

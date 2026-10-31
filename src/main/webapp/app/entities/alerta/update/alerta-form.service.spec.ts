@@ -28,6 +28,7 @@ describe('Alerta Form Service', () => {
             procesada: expect.any(Object),
             servicio: expect.any(Object),
             incidente: expect.any(Object),
+            suprimidaPor: expect.any(Object),
           }),
         );
       });
@@ -46,6 +47,7 @@ describe('Alerta Form Service', () => {
             procesada: expect.any(Object),
             servicio: expect.any(Object),
             incidente: expect.any(Object),
+            suprimidaPor: expect.any(Object),
           }),
         );
       });

@@ -1,0 +1,30 @@
+@if (ventanaDeMantenimiento) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(ventanaDeMantenimiento.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="ventanaDeMantenimientoDeleteDialogHeading" jhiTranslate="entity.delete.title">
+        Confirmar operación de borrado
+      </h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p
+        id="jhi-delete-ventanaDeMantenimiento-heading"
+        jhiTranslate="oncallApp.ventanaDeMantenimiento.delete.question"
+        [translateValues]="{ id: ventanaDeMantenimiento.id }"
+      >
+        ¿Seguro que quiere eliminar Ventana De Mantenimiento {{ ventanaDeMantenimiento.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+      </button>
+
+      <button id="jhi-confirm-delete-ventanaDeMantenimiento" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span jhiTranslate="entity.action.delete">Eliminar</span>
+      </button>
+    </div>
+  </form>
+}

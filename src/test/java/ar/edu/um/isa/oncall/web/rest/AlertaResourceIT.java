@@ -12,6 +12,7 @@ import ar.edu.um.isa.oncall.IntegrationTest;
 import ar.edu.um.isa.oncall.domain.Alerta;
 import ar.edu.um.isa.oncall.domain.Incidente;
 import ar.edu.um.isa.oncall.domain.Servicio;
+import ar.edu.um.isa.oncall.domain.VentanaDeMantenimiento;
 import ar.edu.um.isa.oncall.domain.enumeration.OrigenAlerta;
 import ar.edu.um.isa.oncall.repository.AlertaRepository;
 import ar.edu.um.isa.oncall.service.AlertaService;
@@ -647,6 +648,28 @@ class AlertaResourceIT {
 
         // Get all the alertaList where incidente equals to (incidenteId + 1)
         defaultAlertaShouldNotBeFound("incidenteId.equals=" + (incidenteId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllAlertasBySuprimidaPorIsEqualToSomething() throws Exception {
+        VentanaDeMantenimiento suprimidaPor;
+        if (TestUtil.findAll(em, VentanaDeMantenimiento.class).isEmpty()) {
+            alertaRepository.saveAndFlush(alerta);
+            suprimidaPor = VentanaDeMantenimientoResourceIT.createEntity();
+        } else {
+            suprimidaPor = TestUtil.findAll(em, VentanaDeMantenimiento.class).get(0);
+        }
+        em.persist(suprimidaPor);
+        em.flush();
+        alerta.setSuprimidaPor(suprimidaPor);
+        alertaRepository.saveAndFlush(alerta);
+        Long suprimidaPorId = suprimidaPor.getId();
+        // Get all the alertaList where suprimidaPor equals to suprimidaPorId
+        defaultAlertaShouldBeFound("suprimidaPorId.equals=" + suprimidaPorId);
+
+        // Get all the alertaList where suprimidaPor equals to (suprimidaPorId + 1)
+        defaultAlertaShouldNotBeFound("suprimidaPorId.equals=" + (suprimidaPorId + 1));
     }
 
     private void defaultAlertaFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {

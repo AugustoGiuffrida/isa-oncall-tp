@@ -12,12 +12,15 @@ import { IIncidente } from 'app/entities/incidente/incidente.model';
 import { IncidenteService } from 'app/entities/incidente/service/incidente.service';
 import { ServicioService } from 'app/entities/servicio/service/servicio.service';
 import { IServicio } from 'app/entities/servicio/servicio.model';
+import { IVentanaDeMantenimiento } from 'app/entities/ventana-de-mantenimiento/ventana-de-mantenimiento.model';
 import { AlertError } from 'app/shared/alert/alert-error';
 import { TranslateDirective } from 'app/shared/language';
+
 import { IAlerta } from '../alerta.model';
 import { AlertaService } from '../service/alerta.service';
 
 import { AlertaFormGroup, AlertaFormService } from './alerta-form.service';
+import { VentanaDeMantenimientoService } from 'app/entities/ventana-de-mantenimiento/service/ventana-de-mantenimiento.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,11 +35,13 @@ export class AlertaUpdate implements OnInit {
 
   serviciosSharedCollection = signal<IServicio[]>([]);
   incidentesSharedCollection = signal<IIncidente[]>([]);
+  ventanaDeMantenimientosSharedCollection = signal<IVentanaDeMantenimiento[]>([]);
 
   protected alertaService = inject(AlertaService);
   protected alertaFormService = inject(AlertaFormService);
   protected servicioService = inject(ServicioService);
   protected incidenteService = inject(IncidenteService);
+  protected ventanaDeMantenimientoService = inject(VentanaDeMantenimientoService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -45,6 +50,9 @@ export class AlertaUpdate implements OnInit {
   compareServicio = (o1: IServicio | null, o2: IServicio | null): boolean => this.servicioService.compareServicio(o1, o2);
 
   compareIncidente = (o1: IIncidente | null, o2: IIncidente | null): boolean => this.incidenteService.compareIncidente(o1, o2);
+
+  compareVentanaDeMantenimiento = (o1: IVentanaDeMantenimiento | null, o2: IVentanaDeMantenimiento | null): boolean =>
+    this.ventanaDeMantenimientoService.compareVentanaDeMantenimiento(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ alerta }) => {
@@ -100,6 +108,12 @@ export class AlertaUpdate implements OnInit {
     this.incidentesSharedCollection.update(incidentes =>
       this.incidenteService.addIncidenteToCollectionIfMissing<IIncidente>(incidentes, alerta.incidente),
     );
+    this.ventanaDeMantenimientosSharedCollection.update(ventanaDeMantenimientos =>
+      this.ventanaDeMantenimientoService.addVentanaDeMantenimientoToCollectionIfMissing<IVentanaDeMantenimiento>(
+        ventanaDeMantenimientos,
+        alerta.suprimidaPor,
+      ),
+    );
   }
 
   protected loadRelationshipsOptions(): void {
@@ -120,5 +134,20 @@ export class AlertaUpdate implements OnInit {
         ),
       )
       .subscribe((incidentes: IIncidente[]) => this.incidentesSharedCollection.set(incidentes));
+
+    this.ventanaDeMantenimientoService
+      .query()
+      .pipe(map((res: HttpResponse<IVentanaDeMantenimiento[]>) => res.body ?? []))
+      .pipe(
+        map((ventanaDeMantenimientos: IVentanaDeMantenimiento[]) =>
+          this.ventanaDeMantenimientoService.addVentanaDeMantenimientoToCollectionIfMissing<IVentanaDeMantenimiento>(
+            ventanaDeMantenimientos,
+            this.alerta?.suprimidaPor,
+          ),
+        ),
+      )
+      .subscribe((ventanaDeMantenimientos: IVentanaDeMantenimiento[]) =>
+        this.ventanaDeMantenimientosSharedCollection.set(ventanaDeMantenimientos),
+      );
   }
 }

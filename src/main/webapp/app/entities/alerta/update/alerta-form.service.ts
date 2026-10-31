@@ -40,6 +40,7 @@ type AlertaFormGroupContent = {
   procesada: FormControl<AlertaFormRawValue['procesada']>;
   servicio: FormControl<AlertaFormRawValue['servicio']>;
   incidente: FormControl<AlertaFormRawValue['incidente']>;
+  suprimidaPor: FormControl<AlertaFormRawValue['suprimidaPor']>;
 };
 
 export type AlertaFormGroup = FormGroup<AlertaFormGroupContent>;
@@ -82,6 +83,7 @@ export class AlertaFormService {
         validators: [Validators.required],
       }),
       incidente: new FormControl(alertaRawValue.incidente),
+      suprimidaPor: new FormControl(alertaRawValue.suprimidaPor),
     });
   }
 

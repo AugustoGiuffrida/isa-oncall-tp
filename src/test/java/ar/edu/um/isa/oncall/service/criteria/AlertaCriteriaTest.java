@@ -80,6 +80,7 @@ class AlertaCriteriaTest {
         alertaCriteria.procesada();
         alertaCriteria.servicioId();
         alertaCriteria.incidenteId();
+        alertaCriteria.suprimidaPorId();
         alertaCriteria.distinct();
     }
 
@@ -95,6 +96,7 @@ class AlertaCriteriaTest {
                 condition.apply(criteria.getProcesada()) &&
                 condition.apply(criteria.getServicioId()) &&
                 condition.apply(criteria.getIncidenteId()) &&
+                condition.apply(criteria.getSuprimidaPorId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -112,6 +114,7 @@ class AlertaCriteriaTest {
                 condition.apply(criteria.getProcesada(), copy.getProcesada()) &&
                 condition.apply(criteria.getServicioId(), copy.getServicioId()) &&
                 condition.apply(criteria.getIncidenteId(), copy.getIncidenteId()) &&
+                condition.apply(criteria.getSuprimidaPorId(), copy.getSuprimidaPorId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

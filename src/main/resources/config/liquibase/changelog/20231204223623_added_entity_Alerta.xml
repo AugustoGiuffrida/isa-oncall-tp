@@ -38,6 +38,9 @@
             <column name="incidente_id" type="bigint">
                 <constraints nullable="true" />
             </column>
+            <column name="suprimida_por_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
         <dropDefaultValue tableName="alerta" columnName="recibida_en" columnDataType="${datetimeType}"/>

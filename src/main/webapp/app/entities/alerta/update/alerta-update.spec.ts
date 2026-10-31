@@ -11,6 +11,8 @@ import { IIncidente } from 'app/entities/incidente/incidente.model';
 import { IncidenteService } from 'app/entities/incidente/service/incidente.service';
 import { ServicioService } from 'app/entities/servicio/service/servicio.service';
 import { IServicio } from 'app/entities/servicio/servicio.model';
+import { VentanaDeMantenimientoService } from 'app/entities/ventana-de-mantenimiento/service/ventana-de-mantenimiento.service';
+import { IVentanaDeMantenimiento } from 'app/entities/ventana-de-mantenimiento/ventana-de-mantenimiento.model';
 import { IAlerta } from '../alerta.model';
 import { AlertaService } from '../service/alerta.service';
 
@@ -25,6 +27,7 @@ describe('Alerta Management Update Component', () => {
   let alertaService: AlertaService;
   let servicioService: ServicioService;
   let incidenteService: IncidenteService;
+  let ventanaDeMantenimientoService: VentanaDeMantenimientoService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,6 +49,7 @@ describe('Alerta Management Update Component', () => {
     alertaService = TestBed.inject(AlertaService);
     servicioService = TestBed.inject(ServicioService);
     incidenteService = TestBed.inject(IncidenteService);
+    ventanaDeMantenimientoService = TestBed.inject(VentanaDeMantenimientoService);
 
     comp = fixture.componentInstance;
   });
@@ -95,18 +99,45 @@ describe('Alerta Management Update Component', () => {
       expect(comp.incidentesSharedCollection()).toEqual(expectedCollection);
     });
 
+    it('should call VentanaDeMantenimiento query and add missing value', () => {
+      const alerta: IAlerta = { id: 26829 };
+      const suprimidaPor: IVentanaDeMantenimiento = { id: 31419 };
+      alerta.suprimidaPor = suprimidaPor;
+
+      const ventanaDeMantenimientoCollection: IVentanaDeMantenimiento[] = [{ id: 31419 }];
+      vitest
+        .spyOn(ventanaDeMantenimientoService, 'query')
+        .mockReturnValue(of(new HttpResponse({ body: ventanaDeMantenimientoCollection })));
+      const additionalVentanaDeMantenimientos = [suprimidaPor];
+      const expectedCollection: IVentanaDeMantenimiento[] = [...additionalVentanaDeMantenimientos, ...ventanaDeMantenimientoCollection];
+      vitest.spyOn(ventanaDeMantenimientoService, 'addVentanaDeMantenimientoToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ alerta });
+      comp.ngOnInit();
+
+      expect(ventanaDeMantenimientoService.query).toHaveBeenCalled();
+      expect(ventanaDeMantenimientoService.addVentanaDeMantenimientoToCollectionIfMissing).toHaveBeenCalledWith(
+        ventanaDeMantenimientoCollection,
+        ...additionalVentanaDeMantenimientos.map(i => expect.objectContaining(i) as typeof i),
+      );
+      expect(comp.ventanaDeMantenimientosSharedCollection()).toEqual(expectedCollection);
+    });
+
     it('should update editForm', () => {
       const alerta: IAlerta = { id: 26829 };
       const servicio: IServicio = { id: 24037 };
       alerta.servicio = servicio;
       const incidente: IIncidente = { id: 31968 };
       alerta.incidente = incidente;
+      const suprimidaPor: IVentanaDeMantenimiento = { id: 31419 };
+      alerta.suprimidaPor = suprimidaPor;
 
       activatedRoute.data = of({ alerta });
       comp.ngOnInit();
 
       expect(comp.serviciosSharedCollection()).toContainEqual(servicio);
       expect(comp.incidentesSharedCollection()).toContainEqual(incidente);
+      expect(comp.ventanaDeMantenimientosSharedCollection()).toContainEqual(suprimidaPor);
       expect(comp.alerta).toEqual(alerta);
     });
   });
@@ -197,6 +228,16 @@ describe('Alerta Management Update Component', () => {
         vitest.spyOn(incidenteService, 'compareIncidente');
         comp.compareIncidente(entity, entity2);
         expect(incidenteService.compareIncidente).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
+    describe('compareVentanaDeMantenimiento', () => {
+      it('should forward to ventanaDeMantenimientoService', () => {
+        const entity = { id: 31419 };
+        const entity2 = { id: 27219 };
+        vitest.spyOn(ventanaDeMantenimientoService, 'compareVentanaDeMantenimiento');
+        comp.compareVentanaDeMantenimiento(entity, entity2);
+        expect(ventanaDeMantenimientoService.compareVentanaDeMantenimiento).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

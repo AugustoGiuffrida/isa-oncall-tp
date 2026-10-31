@@ -73,6 +73,7 @@ public class AlertaQueryService extends QueryService<Alerta> {
             if (Long.class != query.getResultType()) {
                 root.fetch(Alerta_.servicio, JoinType.LEFT);
                 root.fetch(Alerta_.incidente, JoinType.LEFT);
+                root.fetch(Alerta_.suprimidaPor, JoinType.LEFT);
             }
             return null;
         });
@@ -89,7 +90,10 @@ public class AlertaQueryService extends QueryService<Alerta> {
                     buildRangeSpecification(criteria.getRecibidaEn(), Alerta_.recibidaEn),
                     buildSpecification(criteria.getProcesada(), Alerta_.procesada),
                     buildSpecification(criteria.getServicioId(), root -> root.join(Alerta_.servicio, JoinType.LEFT).get(Servicio_.id)),
-                    buildSpecification(criteria.getIncidenteId(), root -> root.join(Alerta_.incidente, JoinType.LEFT).get(Incidente_.id))
+                    buildSpecification(criteria.getIncidenteId(), root -> root.join(Alerta_.incidente, JoinType.LEFT).get(Incidente_.id)),
+                    buildSpecification(criteria.getSuprimidaPorId(), root ->
+                        root.join(Alerta_.suprimidaPor, JoinType.LEFT).get(VentanaDeMantenimiento_.id)
+                    )
                 )
             );
         }

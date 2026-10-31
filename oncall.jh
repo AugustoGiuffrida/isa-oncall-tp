@@ -272,6 +272,53 @@ enum EstadoAccion {
 }
 
 // ---------------------------------------------------------------------
+// 5 · VENTANAS DE MANTENIMIENTO  ·  cuando el ruido es esperado
+// ---------------------------------------------------------------------
+
+/**
+ * Rango programado en el que las alertas de sus servicios no abren
+ * incidentes. desde/hasta son la primera ocurrencia; la recurrencia la
+ * repite en hora local de la zona, hasta repetirHasta (inclusive).
+ */
+entity VentanaDeMantenimiento {
+  nombre String required maxlength(80)
+  descripcion String maxlength(500)
+  desde Instant required
+  hasta Instant required
+  recurrencia Recurrencia required
+  zonaHoraria String required maxlength(50)
+  repetirHasta LocalDate
+  activa Boolean required
+}
+
+/**
+ * Un servicio cubierto por una ventana.
+ */
+entity ServicioEnVentana {
+  nota String maxlength(255)
+}
+
+/**
+ * Una ocurrencia puntual de la ventana que se cancela o se mueve. fecha es
+ * el dia, en hora local, en que empezaba la ocurrencia afectada.
+ */
+entity ExcepcionDeVentana {
+  fecha LocalDate required
+  tipo TipoExcepcionDeVentana required
+  nuevoDesde Instant
+  nuevoHasta Instant
+  motivo String maxlength(255)
+}
+
+enum Recurrencia {
+  UNICA, DIARIA, SEMANAL
+}
+
+enum TipoExcepcionDeVentana {
+  CANCELADA, REPROGRAMADA
+}
+
+// ---------------------------------------------------------------------
 // RELACIONES
 // ---------------------------------------------------------------------
 
@@ -293,6 +340,11 @@ relationship ManyToOne {
 
   Notificacion{incidente(titulo) required} to Incidente{notificacion}
   AccionCorrectiva{postmortem(titulo) required} to Postmortem{accion}
+
+  ServicioEnVentana{ventana(nombre) required} to VentanaDeMantenimiento{servicio}
+  ServicioEnVentana{servicio(nombre) required} to Servicio{ventana}
+  ExcepcionDeVentana{ventana(nombre) required} to VentanaDeMantenimiento{excepcion}
+  Alerta{suprimidaPor(nombre)} to VentanaDeMantenimiento{alertaSuprimida}
 }
 
 /**

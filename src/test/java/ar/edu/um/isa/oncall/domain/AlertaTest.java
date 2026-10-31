@@ -3,6 +3,7 @@ package ar.edu.um.isa.oncall.domain;
 import static ar.edu.um.isa.oncall.domain.AlertaTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.IncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.ServicioTestSamples.*;
+import static ar.edu.um.isa.oncall.domain.VentanaDeMantenimientoTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ar.edu.um.isa.oncall.web.rest.TestUtil;
@@ -46,5 +47,17 @@ class AlertaTest {
 
         alerta.incidente(null);
         assertThat(alerta.getIncidente()).isNull();
+    }
+
+    @Test
+    void suprimidaPorTest() {
+        Alerta alerta = getAlertaRandomSampleGenerator();
+        VentanaDeMantenimiento ventanaDeMantenimientoBack = getVentanaDeMantenimientoRandomSampleGenerator();
+
+        alerta.setSuprimidaPor(ventanaDeMantenimientoBack);
+        assertThat(alerta.getSuprimidaPor()).isEqualTo(ventanaDeMantenimientoBack);
+
+        alerta.suprimidaPor(null);
+        assertThat(alerta.getSuprimidaPor()).isNull();
     }
 }

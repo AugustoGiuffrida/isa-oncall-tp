@@ -77,6 +77,21 @@ const routes: Routes = [
     loadChildren: () => import('./ejecucion-de-escalamiento/ejecucion-de-escalamiento.routes'),
   },
   {
+    path: 'ventana-de-mantenimiento',
+    data: { pageTitle: 'oncallApp.ventanaDeMantenimiento.home.title' },
+    loadChildren: () => import('./ventana-de-mantenimiento/ventana-de-mantenimiento.routes'),
+  },
+  {
+    path: 'servicio-en-ventana',
+    data: { pageTitle: 'oncallApp.servicioEnVentana.home.title' },
+    loadChildren: () => import('./servicio-en-ventana/servicio-en-ventana.routes'),
+  },
+  {
+    path: 'excepcion-de-ventana',
+    data: { pageTitle: 'oncallApp.excepcionDeVentana.home.title' },
+    loadChildren: () => import('./excepcion-de-ventana/excepcion-de-ventana.routes'),
+  },
+  {
     path: 'user-management',
     data: { pageTitle: 'userManagement.home.title' },
     loadChildren: () => import('./admin/user-management/user-management.routes'),

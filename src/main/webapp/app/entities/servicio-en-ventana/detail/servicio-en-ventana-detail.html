@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (servicioEnVentana(); as servicioEnVentanaRef) {
+      <div>
+        <h2 data-cy="servicioEnVentanaDetailsHeading">
+          <span jhiTranslate="oncallApp.servicioEnVentana.detail.title">Servicio En Ventana</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ servicioEnVentanaRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.servicioEnVentana.nota">Nota</span></dt>
+          <dd>
+            <span>{{ servicioEnVentanaRef.nota }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.servicioEnVentana.ventana">Ventana</span></dt>
+          <dd>
+            @if (servicioEnVentana()!.ventana) {
+              <div>
+                <a [routerLink]="['/ventana-de-mantenimiento', servicioEnVentana()!.ventana?.id, 'view']">{{
+                  servicioEnVentanaRef.ventana?.nombre
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="oncallApp.servicioEnVentana.servicio">Servicio</span></dt>
+          <dd>
+            @if (servicioEnVentana()!.servicio) {
+              <div>
+                <a [routerLink]="['/servicio', servicioEnVentana()!.servicio?.id, 'view']">{{ servicioEnVentanaRef.servicio?.nombre }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/servicio-en-ventana', servicioEnVentanaRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

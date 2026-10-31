@@ -175,6 +175,23 @@
             }
           </select>
         </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_suprimidaPor" jhiTranslate="oncallApp.alerta.suprimidaPor">Suprimida Por</label>
+          <select
+            class="form-control"
+            id="field_suprimidaPor"
+            data-cy="suprimidaPor"
+            name="suprimidaPor"
+            formControlName="suprimidaPor"
+            [compareWith]="compareVentanaDeMantenimiento"
+          >
+            <option [ngValue]="null"></option>
+            @for (ventanaDeMantenimientoOption of ventanaDeMantenimientosSharedCollection(); track $index) {
+              <option [ngValue]="ventanaDeMantenimientoOption">{{ ventanaDeMantenimientoOption.nombre }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div>

@@ -23,5 +23,12 @@
                                  referencedColumnNames="id"
                                  referencedTableName="incidente"
                                  />
+
+        <addForeignKeyConstraint baseColumnNames="suprimida_por_id"
+                                 baseTableName="alerta"
+                                 constraintName="fk_alerta__suprimida_por_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ventana_de_mantenimiento"
+                                 />
     </changeSet>
 </databaseChangeLog>

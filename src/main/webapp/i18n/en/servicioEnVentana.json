@@ -1,0 +1,26 @@
+{
+  "oncallApp": {
+    "servicioEnVentana": {
+      "home": {
+        "title": "Servicio En Ventanas",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Servicio En Ventana",
+        "createOrEditLabel": "Create or edit a Servicio En Ventana",
+        "notFound": "No Servicio En Ventanas found"
+      },
+      "created": "A new Servicio En Ventana is created with identifier {{ param }}",
+      "updated": "A Servicio En Ventana is updated with identifier {{ param }}",
+      "deleted": "A Servicio En Ventana is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Servicio En Ventana {{ id }}?"
+      },
+      "detail": {
+        "title": "Servicio En Ventana"
+      },
+      "id": "ID",
+      "nota": "Nota",
+      "ventana": "Ventana",
+      "servicio": "Servicio"
+    }
+  }
+}

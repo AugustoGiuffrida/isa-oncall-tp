@@ -1,0 +1,29 @@
+{
+  "oncallApp": {
+    "excepcionDeVentana": {
+      "home": {
+        "title": "Excepcion De Ventanas",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Excepcion De Ventana",
+        "createOrEditLabel": "Create or edit a Excepcion De Ventana",
+        "notFound": "No Excepcion De Ventanas found"
+      },
+      "created": "A new Excepcion De Ventana is created with identifier {{ param }}",
+      "updated": "A Excepcion De Ventana is updated with identifier {{ param }}",
+      "deleted": "A Excepcion De Ventana is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Excepcion De Ventana {{ id }}?"
+      },
+      "detail": {
+        "title": "Excepcion De Ventana"
+      },
+      "id": "ID",
+      "fecha": "Fecha",
+      "tipo": "Tipo",
+      "nuevoDesde": "Nuevo Desde",
+      "nuevoHasta": "Nuevo Hasta",
+      "motivo": "Motivo",
+      "ventana": "Ventana"
+    }
+  }
+}

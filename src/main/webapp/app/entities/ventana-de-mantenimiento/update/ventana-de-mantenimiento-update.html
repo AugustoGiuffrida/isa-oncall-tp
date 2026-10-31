@@ -1,0 +1,207 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-ventana-de-mantenimiento-heading"
+        data-cy="VentanaDeMantenimientoCreateUpdateHeading"
+        jhiTranslate="oncallApp.ventanaDeMantenimiento.home.createOrEditLabel"
+      >
+        Crear o editar Ventana De Mantenimiento
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let nombreRef = editForm.get('nombre')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nombre" jhiTranslate="oncallApp.ventanaDeMantenimiento.nombre">Nombre</label>
+          <input type="text" class="form-control" name="nombre" id="field_nombre" data-cy="nombre" formControlName="nombre" />
+          @if (nombreRef.invalid && (nombreRef.dirty || nombreRef.touched)) {
+            <div>
+              @if (nombreRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              @if (nombreRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '80' }"
+                  >Este campo no puede superar más de 80 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let descripcionRef = editForm.get('descripcion')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_descripcion" jhiTranslate="oncallApp.ventanaDeMantenimiento.descripcion">Descripcion</label>
+          <input
+            type="text"
+            class="form-control"
+            name="descripcion"
+            id="field_descripcion"
+            data-cy="descripcion"
+            formControlName="descripcion"
+          />
+          @if (descripcionRef.invalid && (descripcionRef.dirty || descripcionRef.touched)) {
+            <div>
+              @if (descripcionRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '500' }"
+                  >Este campo no puede superar más de 500 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let desdeRef = editForm.get('desde')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_desde" jhiTranslate="oncallApp.ventanaDeMantenimiento.desde">Desde</label>
+          <div class="d-flex">
+            <input
+              id="field_desde"
+              data-cy="desde"
+              type="datetime-local"
+              class="form-control"
+              name="desde"
+              formControlName="desde"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (desdeRef.invalid && (desdeRef.dirty || desdeRef.touched)) {
+            <div>
+              @if (desdeRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!desdeRef.errors?.datetimelocal" jhiTranslate="entity.validation.datetimelocal"
+                >Este campo debe ser una fecha y hora.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let hastaRef = editForm.get('hasta')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_hasta" jhiTranslate="oncallApp.ventanaDeMantenimiento.hasta">Hasta</label>
+          <div class="d-flex">
+            <input
+              id="field_hasta"
+              data-cy="hasta"
+              type="datetime-local"
+              class="form-control"
+              name="hasta"
+              formControlName="hasta"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (hastaRef.invalid && (hastaRef.dirty || hastaRef.touched)) {
+            <div>
+              @if (hastaRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!hastaRef.errors?.datetimelocal" jhiTranslate="entity.validation.datetimelocal"
+                >Este campo debe ser una fecha y hora.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let recurrenciaRef = editForm.get('recurrencia')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_recurrencia" jhiTranslate="oncallApp.ventanaDeMantenimiento.recurrencia">Recurrencia</label>
+          <select class="form-control" name="recurrencia" formControlName="recurrencia" id="field_recurrencia" data-cy="recurrencia">
+            <option [ngValue]="null">{{ 'oncallApp.Recurrencia.null' | translate }}</option>
+            @for (recurrencia of recurrenciaValues; track $index) {
+              <option [value]="recurrencia">{{ 'oncallApp.Recurrencia.' + recurrencia | translate }}</option>
+            }
+          </select>
+          @if (recurrenciaRef.invalid && (recurrenciaRef.dirty || recurrenciaRef.touched)) {
+            <div>
+              @if (recurrenciaRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let zonaHorariaRef = editForm.get('zonaHoraria')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_zonaHoraria" jhiTranslate="oncallApp.ventanaDeMantenimiento.zonaHoraria">Zona Horaria</label>
+          <input
+            type="text"
+            class="form-control"
+            name="zonaHoraria"
+            id="field_zonaHoraria"
+            data-cy="zonaHoraria"
+            formControlName="zonaHoraria"
+          />
+          @if (zonaHorariaRef.invalid && (zonaHorariaRef.dirty || zonaHorariaRef.touched)) {
+            <div>
+              @if (zonaHorariaRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              @if (zonaHorariaRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+                  >Este campo no puede superar más de 50 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_repetirHasta" jhiTranslate="oncallApp.ventanaDeMantenimiento.repetirHasta"
+            >Repetir Hasta</label
+          >
+          <div class="input-group">
+            <input
+              id="field_repetirHasta"
+              data-cy="repetirHasta"
+              type="text"
+              class="form-control"
+              name="repetirHasta"
+              ngbDatepicker
+              #repetirHastaDp="ngbDatepicker"
+              formControlName="repetirHasta"
+            />
+            <button type="button" class="btn btn-secondary" (click)="repetirHastaDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+        </div>
+
+        @let activaRef = editForm.get('activa')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_activa" jhiTranslate="oncallApp.ventanaDeMantenimiento.activa">Activa</label>
+          <input type="checkbox" class="form-check" name="activa" id="field_activa" data-cy="activa" formControlName="activa" />
+          @if (activaRef.invalid && (activaRef.dirty || activaRef.touched)) {
+            <div>
+              @if (activaRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
