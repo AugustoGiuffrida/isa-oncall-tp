@@ -459,6 +459,18 @@ class EscalamientoServiceTest {
         assertThat(siguiente.orElseThrow().vuelta()).isZero();
     }
 
+    @Test
+    @DisplayName("Dos pasos con el mismo orden se ejecutan los dos, uno despues del otro")
+    void dosPasosConElMismoOrdenSeEjecutanLosDos() {
+        paso(politica, 1, 5, Canal.SMS).destinatarioDirecto(lider);
+
+        procesar(T0);
+        procesar(T0.plus(Duration.ofMinutes(5)));
+        procesar(T0.plus(Duration.ofMinutes(10)));
+
+        assertThat(notificaciones).extracting(Notificacion::getCanal).containsExactly(Canal.PUSH, Canal.SMS, Canal.LLAMADA);
+    }
+
     // ---------------------------------------------------------------------
     // Utilidades
     // ---------------------------------------------------------------------

@@ -192,29 +192,51 @@ public class EscalamientoService {
     record Siguiente(int vuelta, PasoEscalamiento paso) {}
 
     /**
-     * Despues del ultimo escalon, el paso de orden siguiente en la misma vuelta; si no hay, el
-     * primero de la vuelta siguiente; si ya no quedan vueltas, nada.
+     * Despues del ultimo escalon, el paso que le sigue en la politica (ordenada por
+     * {@code orden} y, a igual orden, por id); si no hay, el primero de la vuelta siguiente; si
+     * ya no quedan vueltas, nada.
      *
-     * Se avanza por {@code orden} y no por posicion: si alguien edita la politica en medio de
-     * un incidente, la cadena sigue desde el nivel en el que estaba.
+     * Se avanza desde el paso que se ejecuto, no buscando un {@code orden} mayor: asi dos pasos
+     * con el mismo orden se ejecutan los dos, uno despues del otro. Si ese paso ya no esta en
+     * la politica (alguien la edito en medio de un incidente), la cadena sigue desde el nivel
+     * en el que estaba.
      */
     static Optional<Siguiente> siguiente(Optional<EjecucionDeEscalamiento> ultimo, List<PasoEscalamiento> pasos, int repetirVeces) {
         if (ultimo.isEmpty()) {
             return Optional.of(new Siguiente(0, pasos.get(0)));
         }
         int vuelta = ultimo.orElseThrow().getVuelta();
-        int nivel = ultimo.orElseThrow().getNivel();
-        Optional<PasoEscalamiento> mismaVuelta = pasos
-            .stream()
-            .filter(paso -> paso.getOrden() > nivel)
-            .findFirst();
-        if (mismaVuelta.isPresent()) {
-            return Optional.of(new Siguiente(vuelta, mismaVuelta.orElseThrow()));
+        int posicion = posicionDelUltimo(ultimo.orElseThrow(), pasos);
+        if (posicion + 1 < pasos.size()) {
+            return Optional.of(new Siguiente(vuelta, pasos.get(posicion + 1)));
         }
         if (vuelta < repetirVeces) {
             return Optional.of(new Siguiente(vuelta + 1, pasos.get(0)));
         }
         return Optional.empty();
+    }
+
+    /**
+     * La posicion, en la politica ordenada, del paso que ejecuto el ultimo escalon. Si ese paso
+     * ya no esta, la del ultimo paso con un orden menor o igual al nivel alcanzado; -1 si no hay
+     * ninguno.
+     */
+    private static int posicionDelUltimo(EjecucionDeEscalamiento ultimo, List<PasoEscalamiento> pasos) {
+        PasoEscalamiento ejecutado = ultimo.getPaso();
+        if (ejecutado != null && ejecutado.getId() != null) {
+            for (int i = 0; i < pasos.size(); i++) {
+                if (ejecutado.getId().equals(pasos.get(i).getId())) {
+                    return i;
+                }
+            }
+        }
+        int posicion = -1;
+        for (int i = 0; i < pasos.size(); i++) {
+            if (pasos.get(i).getOrden() <= ultimo.getNivel()) {
+                posicion = i;
+            }
+        }
+        return posicion;
     }
 
     /**
