@@ -1,5 +1,8 @@
 package ar.edu.um.isa.oncall.service;
 
+import ar.edu.um.isa.oncall.domain.Cambio;
+import ar.edu.um.isa.oncall.domain.CorrelacionCambioIncidente;
+import ar.edu.um.isa.oncall.domain.DespliegueDeServicio;
 import ar.edu.um.isa.oncall.domain.EjecucionDeEscalamiento;
 import ar.edu.um.isa.oncall.domain.EventoDeIncidente;
 import ar.edu.um.isa.oncall.domain.Incidente;
@@ -8,6 +11,7 @@ import ar.edu.um.isa.oncall.domain.PasoEscalamiento;
 import ar.edu.um.isa.oncall.domain.PoliticaEscalamiento;
 import ar.edu.um.isa.oncall.domain.Servicio;
 import ar.edu.um.isa.oncall.domain.User;
+import ar.edu.um.isa.oncall.domain.enumeration.Canal;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoIncidente;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoNotificacion;
 import ar.edu.um.isa.oncall.domain.enumeration.ResultadoEscalamiento;
@@ -45,6 +49,11 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>La espera se cuenta desde que el paso <em>efectivamente se ejecuto</em>, no desde cuando
  * le tocaba. Si el proceso estuvo caido media hora, al volver ejecuta un paso y espera; no
  * dispara de golpe todos los que se acumularon.</p>
+ *
+ * <p>Gestion de cambios (extension 6): si el incidente esta correlacionado con un cambio
+ * reciente, antes del paso 1 hay un <strong>nivel 0</strong> que avisa al autor de ese cambio,
+ * con el canal y la espera del paso 1. Va solo en la primera vuelta: las repeticiones recorren
+ * la politica normal. El sospechoso lo elige {@link CorrelacionDeCambiosService}.</p>
  *
  * <p>Cortes: el incidente resuelto o cerrado, reconocido (o mitigado), silenciado (es una
  * pausa: al vencer el silencio la cadena sigue donde estaba) y el escalamiento agotado.</p>
@@ -85,19 +94,22 @@ public class EscalamientoService {
     private final NotificacionRepository notificacionRepository;
     private final EventoDeIncidenteRepository eventoDeIncidenteRepository;
     private final GuardiaVigenteService guardiaVigenteService;
+    private final CorrelacionDeCambiosService correlacionDeCambiosService;
 
     public EscalamientoService(
         EscalamientoRepository escalamientoRepository,
         EjecucionDeEscalamientoRepository ejecucionDeEscalamientoRepository,
         NotificacionRepository notificacionRepository,
         EventoDeIncidenteRepository eventoDeIncidenteRepository,
-        GuardiaVigenteService guardiaVigenteService
+        GuardiaVigenteService guardiaVigenteService,
+        CorrelacionDeCambiosService correlacionDeCambiosService
     ) {
         this.escalamientoRepository = escalamientoRepository;
         this.ejecucionDeEscalamientoRepository = ejecucionDeEscalamientoRepository;
         this.notificacionRepository = notificacionRepository;
         this.eventoDeIncidenteRepository = eventoDeIncidenteRepository;
         this.guardiaVigenteService = guardiaVigenteService;
+        this.correlacionDeCambiosService = correlacionDeCambiosService;
     }
 
     /**
@@ -169,13 +181,21 @@ public class EscalamientoService {
     ) {
         List<PasoEscalamiento> pasos = pasosOrdenados(politica);
         int vueltas = politica.getRepetirVeces() + 1;
-        // tope defensivo: nunca hay mas escalones que pasos por vueltas, mas la marca de agotado
-        int tope = pasos.size() * vueltas + 1;
+        // tope defensivo: nunca hay mas escalones que pasos por vueltas, mas el nivel 0 y la marca de agotado
+        int tope = pasos.size() * vueltas + 2;
 
         for (int i = 0; i < tope; i++) {
             Optional<EjecucionDeEscalamiento> ultimo = ultimoEscalon(historial, nuevas);
             if (ultimo.isPresent() && ultimo.orElseThrow().getProximoEn() != null && ultimo.orElseThrow().getProximoEn().isAfter(ahora)) {
                 return;
+            }
+
+            if (ultimo.isEmpty()) {
+                Optional<CorrelacionCambioIncidente> sospechoso = correlacionDeCambiosService.sospechosoPrincipal(incidente, ahora);
+                if (sospechoso.isPresent()) {
+                    nuevas.add(ejecutarNivelCero(incidente, pasos.get(0), sospechoso.orElseThrow(), ahora));
+                    continue;
+                }
             }
 
             Optional<Siguiente> siguiente = siguiente(ultimo, pasos, politica.getRepetirVeces());
@@ -324,10 +344,6 @@ public class EscalamientoService {
         } else {
             criterio = "el paso no apunta ni a una rotacion ni a una persona";
         }
-        if (destinatario != null && !destinatario.isActivated()) {
-            criterio = criterio + "; el usuario " + destinatario.getLogin() + " no esta activo";
-            destinatario = null;
-        }
 
         EjecucionDeEscalamiento ejecucion = new EjecucionDeEscalamiento()
             .vuelta(vuelta)
@@ -335,13 +351,72 @@ public class EscalamientoService {
             .ejecutadoEn(ahora)
             .incidente(incidente)
             .paso(paso);
+        return registrarEscalon(incidente, ejecucion, destinatario, paso.getCanal(), paso.getEsperaMinutos(), escalon, criterio, ahora);
+    }
+
+    /**
+     * El nivel 0: avisa al autor del cambio sospechoso, con el canal y la espera del paso 1.
+     */
+    private EjecucionDeEscalamiento ejecutarNivelCero(
+        Incidente incidente,
+        PasoEscalamiento primerPaso,
+        CorrelacionCambioIncidente correlacion,
+        Instant ahora
+    ) {
+        DespliegueDeServicio despliegue = correlacion.getDespliegue();
+        Cambio cambio = despliegue.getCambio();
+        String criterio =
+            "autor del cambio '" +
+            cambio.getTitulo() +
+            "', desplegado sobre " +
+            despliegue.getServicio().getNombre() +
+            " (version " +
+            despliegue.getVersion() +
+            ") a las " +
+            despliegue.getDesplegadoEn() +
+            "; correlacion " +
+            correlacion.getOrigen() +
+            " " +
+            correlacion.getEstado();
+
+        EjecucionDeEscalamiento ejecucion = new EjecucionDeEscalamiento().vuelta(0).nivel(0).ejecutadoEn(ahora).incidente(incidente);
+        return registrarEscalon(
+            incidente,
+            ejecucion,
+            cambio.getAutor(),
+            primerPaso.getCanal(),
+            primerPaso.getEsperaMinutos(),
+            "Escalamiento nivel 0 (autor del cambio)",
+            criterio,
+            ahora
+        );
+    }
+
+    /**
+     * Comun a todos los escalones: si hay a quien avisar, deja la notificacion y la espera; si
+     * no, anota que no hubo a quien y deja vencido al escalon siguiente.
+     */
+    private EjecucionDeEscalamiento registrarEscalon(
+        Incidente incidente,
+        EjecucionDeEscalamiento ejecucion,
+        User destinatario,
+        Canal canal,
+        int esperaMinutos,
+        String escalon,
+        String criterio,
+        Instant ahora
+    ) {
+        if (destinatario != null && !destinatario.isActivated()) {
+            criterio = criterio + "; el usuario " + destinatario.getLogin() + " no esta activo";
+            destinatario = null;
+        }
 
         String detalle;
         if (destinatario != null) {
-            Instant proximoEn = ahora.plus(Duration.ofMinutes(paso.getEsperaMinutos()));
+            Instant proximoEn = ahora.plus(Duration.ofMinutes(esperaMinutos));
             notificacionRepository.save(
                 new Notificacion()
-                    .canal(paso.getCanal())
+                    .canal(canal)
                     .destino(recortar(destinatario.getEmail() != null ? destinatario.getEmail() : destinatario.getLogin(), MAX_DESTINO))
                     .estado(EstadoNotificacion.PENDIENTE)
                     .intentos(0)
@@ -353,7 +428,7 @@ public class EscalamientoService {
                 ": se notifico a " +
                 destinatario.getLogin() +
                 " por " +
-                paso.getCanal() +
+                canal +
                 " (" +
                 criterio +
                 "). Si nadie reconoce, el proximo escalon sale a las " +

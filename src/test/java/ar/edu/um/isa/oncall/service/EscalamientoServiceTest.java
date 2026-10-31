@@ -4,8 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ar.edu.um.isa.oncall.domain.Cambio;
+import ar.edu.um.isa.oncall.domain.CorrelacionCambioIncidente;
+import ar.edu.um.isa.oncall.domain.DespliegueDeServicio;
 import ar.edu.um.isa.oncall.domain.EjecucionDeEscalamiento;
 import ar.edu.um.isa.oncall.domain.EventoDeIncidente;
 import ar.edu.um.isa.oncall.domain.Incidente;
@@ -17,8 +22,10 @@ import ar.edu.um.isa.oncall.domain.Servicio;
 import ar.edu.um.isa.oncall.domain.User;
 import ar.edu.um.isa.oncall.domain.enumeration.Canal;
 import ar.edu.um.isa.oncall.domain.enumeration.Criticidad;
+import ar.edu.um.isa.oncall.domain.enumeration.EstadoCorrelacion;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoIncidente;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoNotificacion;
+import ar.edu.um.isa.oncall.domain.enumeration.OrigenCorrelacion;
 import ar.edu.um.isa.oncall.domain.enumeration.ResultadoEscalamiento;
 import ar.edu.um.isa.oncall.domain.enumeration.Severidad;
 import ar.edu.um.isa.oncall.domain.enumeration.TipoEvento;
@@ -71,6 +78,9 @@ class EscalamientoServiceTest {
     @Mock
     private GuardiaVigenteService guardiaVigenteService;
 
+    @Mock
+    private CorrelacionDeCambiosService correlacionDeCambiosService;
+
     private EscalamientoService servicio;
 
     private final List<EjecucionDeEscalamiento> ejecuciones = new ArrayList<>();
@@ -94,7 +104,8 @@ class EscalamientoServiceTest {
             ejecucionDeEscalamientoRepository,
             notificacionRepository,
             eventoDeIncidenteRepository,
-            guardiaVigenteService
+            guardiaVigenteService,
+            correlacionDeCambiosService
         );
 
         ana = usuario("ana");
@@ -287,6 +298,79 @@ class EscalamientoServiceTest {
 
         assertThat(estado.politicaId()).isEqualTo(politica.getId());
         assertThat(notificaciones).singleElement().extracting(Notificacion::getCanal).isEqualTo(Canal.PUSH);
+    }
+
+    // ---------------------------------------------------------------------
+    // Gestion de cambios: nivel 0 al autor del cambio
+    // ---------------------------------------------------------------------
+
+    @Test
+    @DisplayName("Con un cambio correlacionado, el primer aviso va al autor del cambio, con el canal y la espera del paso 1")
+    void conUnCambioCorrelacionadoElPrimerAvisoVaAlAutor() {
+        User autor = usuario("autor");
+        hayUnCambioSospechoso(autor);
+
+        EstadoDeEscalamientoDTO estado = procesar(T0);
+
+        assertThat(notificaciones)
+            .singleElement()
+            .satisfies(notificacion -> {
+                assertThat(notificacion.getDestinatario()).isEqualTo(autor);
+                assertThat(notificacion.getCanal()).isEqualTo(Canal.PUSH);
+            });
+        assertThat(estado.nivel()).isZero();
+        assertThat(estado.proximoEscalamientoEn()).isEqualTo(T0.plus(Duration.ofMinutes(5)));
+        assertThat(ejecuciones.get(0).getDetalle()).contains("autor del cambio 'Subir pool de conexiones'");
+    }
+
+    @Test
+    @DisplayName("Si el autor no reconoce, la cadena sigue con el paso 1 de la politica")
+    void siElAutorNoReconoceSigueElPaso1() {
+        User autor = usuario("autor");
+        hayUnCambioSospechoso(autor);
+
+        procesar(T0);
+        EstadoDeEscalamientoDTO estado = procesar(T0.plus(Duration.ofMinutes(5)));
+
+        assertThat(notificaciones).extracting(Notificacion::getDestinatario).containsExactly(autor, ana);
+        assertThat(estado.nivel()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Un autor desactivado no frena la cadena: el nivel 0 queda sin destinatario y sale el paso 1")
+    void unAutorDesactivadoNoFrenaLaCadena() {
+        User autor = usuario("autor");
+        autor.setActivated(false);
+        hayUnCambioSospechoso(autor);
+
+        procesar(T0);
+
+        assertThat(ejecuciones)
+            .extracting(EjecucionDeEscalamiento::getNivel, EjecucionDeEscalamiento::getResultado)
+            .containsExactly(
+                org.assertj.core.groups.Tuple.tuple(0, ResultadoEscalamiento.SIN_DESTINATARIO),
+                org.assertj.core.groups.Tuple.tuple(1, ResultadoEscalamiento.NOTIFICADO)
+            );
+        assertThat(notificaciones).singleElement().extracting(Notificacion::getDestinatario).isEqualTo(ana);
+    }
+
+    @Test
+    @DisplayName("El nivel 0 va solo en la primera vuelta, y el sospechoso se busca una sola vez")
+    void elNivel0VaSoloEnLaPrimeraVuelta() {
+        politica.setRepetirVeces(1);
+        User autor = usuario("autor");
+        hayUnCambioSospechoso(autor);
+
+        procesar(T0); // nivel 0
+        procesar(T0.plus(Duration.ofMinutes(5))); // paso 1
+        procesar(T0.plus(Duration.ofMinutes(10))); // paso 2
+        procesar(T0.plus(Duration.ofMinutes(20))); // paso 3
+        EstadoDeEscalamientoDTO estado = procesar(T0.plus(Duration.ofMinutes(35))); // vuelta 2, paso 1
+
+        assertThat(estado.vuelta()).isEqualTo(1);
+        assertThat(estado.nivel()).isEqualTo(1);
+        assertThat(notificaciones).extracting(Notificacion::getDestinatario).containsExactly(autor, ana, ana, lider, ana);
+        verify(correlacionDeCambiosService, times(1)).sospechosoPrincipal(any(), any());
     }
 
     // ---------------------------------------------------------------------
@@ -502,6 +586,21 @@ class EscalamientoServiceTest {
         when(guardiaVigenteService.resolver(eq(backend), any(Instant.class))).thenReturn(
             new GuardiaVigenteService.Resolucion(guardia, usuario)
         );
+    }
+
+    private void hayUnCambioSospechoso(User autor) {
+        Cambio cambio = new Cambio().titulo("Subir pool de conexiones").autor(autor);
+        DespliegueDeServicio despliegue = new DespliegueDeServicio()
+            .version("2.4.1")
+            .desplegadoEn(T0.minus(Duration.ofMinutes(10)))
+            .cambio(cambio)
+            .servicio(pagos);
+        CorrelacionCambioIncidente correlacion = new CorrelacionCambioIncidente()
+            .origen(OrigenCorrelacion.AUTOMATICA)
+            .estado(EstadoCorrelacion.SUGERIDA)
+            .despliegue(despliegue)
+            .incidente(incidente);
+        when(correlacionDeCambiosService.sospechosoPrincipal(eq(incidente), any(Instant.class))).thenReturn(Optional.of(correlacion));
     }
 
     private User usuario(String login) {

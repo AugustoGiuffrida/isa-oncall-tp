@@ -245,3 +245,7 @@ oncall:
     # Cada cuanto corre (ISO-8601). Es la resolucion de la regla: un paso de 5 minutos sale
     # entre los 5:00 y los 5:00 + intervalo.
     intervalo: PT30S
+  cambios:
+    # Un despliegue sobre un servicio del incidente dentro de esta ventana anterior a la
+    # deteccion queda correlacionado, y su autor recibe el primer aviso (nivel 0).
+    ventana-correlacion-minutos: 60

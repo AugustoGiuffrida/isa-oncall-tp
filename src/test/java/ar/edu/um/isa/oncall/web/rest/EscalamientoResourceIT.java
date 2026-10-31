@@ -7,6 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import ar.edu.um.isa.oncall.IntegrationTest;
+import ar.edu.um.isa.oncall.domain.Cambio;
+import ar.edu.um.isa.oncall.domain.CorrelacionCambioIncidente;
+import ar.edu.um.isa.oncall.domain.DespliegueDeServicio;
 import ar.edu.um.isa.oncall.domain.EjecucionDeEscalamiento;
 import ar.edu.um.isa.oncall.domain.Equipo;
 import ar.edu.um.isa.oncall.domain.EventoDeIncidente;
@@ -21,7 +24,9 @@ import ar.edu.um.isa.oncall.domain.User;
 import ar.edu.um.isa.oncall.domain.enumeration.Canal;
 import ar.edu.um.isa.oncall.domain.enumeration.Criticidad;
 import ar.edu.um.isa.oncall.domain.enumeration.Entorno;
+import ar.edu.um.isa.oncall.domain.enumeration.EstadoCorrelacion;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoIncidente;
+import ar.edu.um.isa.oncall.domain.enumeration.OrigenCorrelacion;
 import ar.edu.um.isa.oncall.domain.enumeration.RolDeGuardia;
 import ar.edu.um.isa.oncall.domain.enumeration.Severidad;
 import ar.edu.um.isa.oncall.domain.enumeration.TipoEvento;
@@ -197,6 +202,49 @@ class EscalamientoResourceIT {
 
     @Test
     @Transactional
+    @DisplayName("Un cambio desplegado poco antes del incidente: queda correlacionado y el primer aviso va a su autor")
+    void unCambioRecienteLlevaElPrimerAvisoASuAutor() throws Exception {
+        Incidente incidente = incidenteConPolitica();
+        desplegarCambio(incidente, "user", Duration.ofMinutes(10));
+
+        restMockMvc.perform(post(API_EJECUTAR)).andExpect(status().isOk());
+
+        assertThat(notificacionesDe(incidente))
+            .singleElement()
+            .satisfies(notificacion -> {
+                assertThat(notificacion.getDestinatario().getLogin()).isEqualTo("user");
+                assertThat(notificacion.getCanal()).isEqualTo(Canal.PUSH);
+            });
+        assertThat(correlacionesDe(incidente))
+            .singleElement()
+            .satisfies(correlacion -> {
+                assertThat(correlacion.getOrigen()).isEqualTo(OrigenCorrelacion.AUTOMATICA);
+                assertThat(correlacion.getEstado()).isEqualTo(EstadoCorrelacion.SUGERIDA);
+            });
+        restMockMvc
+            .perform(get("/api/incidentes/{id}/escalamiento", incidente.getId()))
+            .andExpect(jsonPath("$.nivel").value(0))
+            .andExpect(jsonPath("$.historial[0].destinatario").value("user"));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Un despliegue fuera de la ventana no se correlaciona: el primer aviso va a la guardia")
+    void unDespliegueViejoNoSeCorrelaciona() throws Exception {
+        Incidente incidente = incidenteConPolitica();
+        desplegarCambio(incidente, "user", Duration.ofHours(2));
+
+        restMockMvc.perform(post(API_EJECUTAR)).andExpect(status().isOk());
+
+        assertThat(notificacionesDe(incidente))
+            .singleElement()
+            .extracting(n -> n.getDestinatario().getLogin())
+            .isEqualTo("admin");
+        assertThat(correlacionesDe(incidente)).isEmpty();
+    }
+
+    @Test
+    @Transactional
     @DisplayName("Un incidente que no existe da 404")
     void unIncidenteQueNoExisteDa404() throws Exception {
         restMockMvc.perform(get("/api/incidentes/{id}/escalamiento", Long.MAX_VALUE)).andExpect(status().isNotFound());
@@ -270,6 +318,33 @@ class EscalamientoResourceIT {
         em.flush();
         em.clear();
         return incidente;
+    }
+
+    /** Un cambio de {@code login} desplegado sobre el servicio del incidente, {@code antes} de la deteccion. */
+    private void desplegarCambio(Incidente detached, String login, Duration antes) {
+        Incidente incidente = em.find(Incidente.class, detached.getId());
+        Servicio servicio = incidente.getServicios().iterator().next();
+        Cambio cambio = new Cambio()
+            .titulo("cambio-" + SECUENCIA.incrementAndGet())
+            .creadoEn(incidente.getDetectadoEn().minus(antes))
+            .autor(userRepository.findOneByLogin(login).orElseThrow());
+        em.persist(cambio);
+        em.persist(
+            new DespliegueDeServicio()
+                .version("1.0." + SECUENCIA.get())
+                .desplegadoEn(incidente.getDetectadoEn().minus(antes))
+                .cambio(cambio)
+                .servicio(servicio)
+        );
+        em.flush();
+        em.clear();
+    }
+
+    private List<CorrelacionCambioIncidente> correlacionesDe(Incidente incidente) {
+        return em
+            .createQuery("select c from CorrelacionCambioIncidente c where c.incidente.id = :id", CorrelacionCambioIncidente.class)
+            .setParameter("id", incidente.getId())
+            .getResultList();
     }
 
     private List<Notificacion> notificacionesDe(Incidente incidente) {
