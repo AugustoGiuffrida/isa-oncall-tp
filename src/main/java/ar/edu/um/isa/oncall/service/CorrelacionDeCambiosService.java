@@ -29,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
  * {@code oncall.cambios.ventana-correlacion-minutos} anterior a la deteccion, queda
  * correlacionado automaticamente como {@code SUGERIDA}. Una persona puede cargar
  * correlaciones a mano (por el ABM) o descartar las automaticas: una {@code DESCARTADA} no
- * cuenta.</p>
+ * cuenta. Tampoco cuenta, aunque sea manual, un despliegue posterior a la deteccion: no pudo
+ * causar el incidente (suele ser el arreglo). Queda cargada como dato, pero no recibe el aviso.</p>
  *
  * <p>Si hay varias correlaciones vigentes, el sospechoso principal es el despliegue mas
  * cercano a la deteccion: el ultimo que se toco antes de que se rompiera. A su autor va el
@@ -70,7 +71,8 @@ public class CorrelacionDeCambiosService {
      * @param incidente el incidente, con sus servicios accesibles.
      * @param ahora el instante de la corrida, que queda como {@code detectadaEn} de las
      *        correlaciones nuevas.
-     * @return la correlacion vigente mas cercana a la deteccion, o vacio si no hay ninguna.
+     * @return la correlacion vigente mas cercana a la deteccion (sin pasarla), o vacio si no hay
+     *         ninguna.
      */
     public Optional<CorrelacionCambioIncidente> sospechosoPrincipal(Incidente incidente, Instant ahora) {
         List<CorrelacionCambioIncidente> correlaciones = new ArrayList<>(
@@ -81,6 +83,7 @@ public class CorrelacionDeCambiosService {
         return correlaciones
             .stream()
             .filter(correlacion -> correlacion.getEstado() != EstadoCorrelacion.DESCARTADA)
+            .filter(correlacion -> !correlacion.getDespliegue().getDesplegadoEn().isAfter(incidente.getDetectadoEn()))
             .max(
                 Comparator.comparing((CorrelacionCambioIncidente correlacion) ->
                     correlacion.getDespliegue().getDesplegadoEn()

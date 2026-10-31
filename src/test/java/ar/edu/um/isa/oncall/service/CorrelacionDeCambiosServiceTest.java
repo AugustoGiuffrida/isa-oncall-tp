@@ -146,6 +146,16 @@ class CorrelacionDeCambiosServiceTest {
     }
 
     @Test
+    @DisplayName("Una correlacion manual con un despliegue posterior a la deteccion no cuenta: no pudo causarlo")
+    void unaCorrelacionManualPosteriorALaDeteccionNoCuenta() {
+        DespliegueDeServicio arreglo = despliegue("ana", -10);
+        existentes.add(correlacion(arreglo, OrigenCorrelacion.MANUAL, EstadoCorrelacion.CONFIRMADA));
+        hayDesplieguesEnLaVentana();
+
+        assertThat(servicio.sospechosoPrincipal(incidente, AHORA)).isEmpty();
+    }
+
+    @Test
     @DisplayName("Sin despliegues ni correlaciones no hay sospechoso")
     void sinDesplieguesNoHaySospechoso() {
         hayDesplieguesEnLaVentana();
