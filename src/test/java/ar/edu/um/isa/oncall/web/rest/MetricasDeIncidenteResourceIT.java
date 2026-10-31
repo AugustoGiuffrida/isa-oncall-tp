@@ -105,6 +105,47 @@ class MetricasDeIncidenteResourceIT {
 
     @Test
     @Transactional
+    @DisplayName("El reporte del periodo promedia los incidentes del servicio")
+    void elReporteDelPeriodo() throws Exception {
+        Servicio servicio = servicioConObjetivos();
+        Instant base = Instant.parse("2026-02-01T00:00:00Z");
+        Incidente uno = incidente(servicio, base);
+        uno.reconocidoEn(base.plus(Duration.ofMinutes(2)))
+            .resueltoEn(base.plus(Duration.ofMinutes(20)))
+            .estado(EstadoIncidente.RESUELTO);
+        Incidente dos = incidente(servicio, base.plus(Duration.ofHours(1)));
+        dos.reconocidoEn(base.plus(Duration.ofHours(1)).plus(Duration.ofMinutes(10)))
+            .resueltoEn(base.plus(Duration.ofHours(1)).plus(Duration.ofMinutes(40)))
+            .estado(EstadoIncidente.RESUELTO);
+        em.flush();
+
+        restMockMvc
+            .perform(
+                get("/api/metricas/incidentes")
+                    .param("desde", "2026-02-01T00:00:00Z")
+                    .param("hasta", "2026-02-02T00:00:00Z")
+                    .param("servicioId", servicio.getId().toString())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.total.incidentes").value(2))
+            .andExpect(jsonPath("$.total.mttaMinutos").value(6.0))
+            .andExpect(jsonPath("$.total.mttrMinutos").value(30.0))
+            .andExpect(jsonPath("$.total.cumplimientoReconocimiento").value(50.0))
+            .andExpect(jsonPath("$.total.cumplimientoResolucion").value(100.0))
+            .andExpect(jsonPath("$.porSeveridad[0].severidad").value("SEV1"));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Un periodo invertido se rechaza con 400")
+    void unPeriodoInvertidoSeRechaza() throws Exception {
+        restMockMvc
+            .perform(get("/api/metricas/incidentes").param("desde", "2026-02-02T00:00:00Z").param("hasta", "2026-02-01T00:00:00Z"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
     @DisplayName("Un incidente que no existe da 404")
     void unIncidenteQueNoExisteDa404() throws Exception {
         restMockMvc.perform(get("/api/incidentes/{id}/metricas", Long.MAX_VALUE)).andExpect(status().isNotFound());

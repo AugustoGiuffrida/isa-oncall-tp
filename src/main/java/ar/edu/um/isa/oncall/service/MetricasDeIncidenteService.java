@@ -4,14 +4,18 @@ import ar.edu.um.isa.oncall.domain.Incidente;
 import ar.edu.um.isa.oncall.domain.ObjetivoDeServicio;
 import ar.edu.um.isa.oncall.domain.Servicio;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoIncidente;
+import ar.edu.um.isa.oncall.domain.enumeration.Severidad;
 import ar.edu.um.isa.oncall.domain.enumeration.TipoObjetivo;
 import ar.edu.um.isa.oncall.repository.IncidenteRepository;
 import ar.edu.um.isa.oncall.repository.MetricasDeIncidenteRepository;
 import ar.edu.um.isa.oncall.service.dto.EvaluacionDeIncidenteDTO;
 import ar.edu.um.isa.oncall.service.dto.EvaluacionDeIncidenteDTO.EstadoMedicion;
 import ar.edu.um.isa.oncall.service.dto.EvaluacionDeIncidenteDTO.Medicion;
+import ar.edu.um.isa.oncall.service.dto.ReporteDeMetricasDTO;
+import ar.edu.um.isa.oncall.service.dto.ReporteDeMetricasDTO.Resumen;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -19,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -27,10 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Regla de negocio B · Tiempos de reconocimiento y resolucion contra los SLOs.
- *
- * <p>Mide cada incidente por separado: es la materia prima del MTTA y el MTTR, que son el
- * promedio de estos tiempos sobre un periodo.</p>
+ * Regla de negocio B · Calculo de MTTA / MTTR contra los SLOs.
  *
  * <p>Cada incidente se mide dos veces, siempre desde {@code detectadoEn}:</p>
  * <ul>
@@ -52,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>Un incidente todavia abierto cuyo objetivo ya vencio es {@code INCUMPLIDO}, no
  *       {@code EN_CURSO}: ya no hay forma de que lo cumpla.</li>
  *   <li>Marcas que no cierran (resuelto antes de detectado, o terminado sin marca de
- *       resolucion) dan {@code INCONSISTENTE} y quedan sin veredicto.</li>
+ *       resolucion) dan {@code INCONSISTENTE} y no entran en los promedios.</li>
  *   <li>Sin objetivo para esa severidad, el tiempo se mide pero no se juzga.</li>
  * </ul>
  *
@@ -65,7 +67,10 @@ public class MetricasDeIncidenteService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetricasDeIncidenteService.class);
 
-    /** Los tipos de objetivo que se miden. {@code DISPONIBILIDAD} es de periodo, no de incidente. */
+    /** Periodo del reporte cuando no se indica uno: los ultimos treinta dias. */
+    public static final Duration PERIODO_POR_DEFECTO = Duration.ofDays(30);
+
+    /** Los tipos de objetivo que se miden por incidente. {@code DISPONIBILIDAD} es de periodo, no de incidente. */
     static final Set<TipoObjetivo> TIPOS_MEDIDOS = EnumSet.of(TipoObjetivo.TIEMPO_DE_RECONOCIMIENTO, TipoObjetivo.TIEMPO_DE_RESOLUCION);
 
     private static final Set<EstadoIncidente> ESTADOS_TERMINADOS = EnumSet.of(EstadoIncidente.RESUELTO, EstadoIncidente.CERRADO);
@@ -122,6 +127,44 @@ public class MetricasDeIncidenteService {
             LOG.debug("Incidente {}: cumplioObjetivo = {}", incidente.getId(), evaluacion.cumplioObjetivo());
         }
         return evaluacion;
+    }
+
+    /**
+     * MTTA, MTTR y cumplimiento de los incidentes detectados en un periodo.
+     *
+     * @param desde inicio del periodo, inclusive.
+     * @param hasta fin del periodo, exclusive.
+     * @param servicioId si no es {@code null}, solo los incidentes que afectaron a ese servicio.
+     * @param ahora contra que instante se miden los incidentes que siguen abiertos.
+     * @return el reporte.
+     */
+    @Transactional(readOnly = true)
+    public ReporteDeMetricasDTO reporte(Instant desde, Instant hasta, Long servicioId, Instant ahora) {
+        List<Incidente> incidentes =
+            servicioId == null
+                ? metricasDeIncidenteRepository.buscarDetectadosEntre(desde, hasta)
+                : metricasDeIncidenteRepository.buscarDetectadosEntreSobreServicio(desde, hasta, servicioId);
+        List<ObjetivoDeServicio> objetivos = objetivosDe(incidentes);
+
+        List<EvaluacionDeIncidenteDTO> evaluaciones = incidentes
+            .stream()
+            .map(incidente -> evaluar(incidente, objetivos, ahora))
+            .toList();
+
+        List<Resumen> porSeveridad = Arrays.stream(Severidad.values())
+            .map(severidad ->
+                resumir(
+                    severidad,
+                    evaluaciones
+                        .stream()
+                        .filter(evaluacion -> evaluacion.severidad() == severidad)
+                        .toList()
+                )
+            )
+            .filter(resumen -> resumen.incidentes() > 0)
+            .toList();
+
+        return new ReporteDeMetricasDTO(desde, hasta, servicioId, resumir(null, evaluaciones), porSeveridad);
     }
 
     /**
@@ -239,6 +282,31 @@ public class MetricasDeIncidenteService {
         return true;
     }
 
+    static Resumen resumir(Severidad severidad, List<EvaluacionDeIncidenteDTO> evaluaciones) {
+        List<Long> tiemposDeReconocimiento = segundosMedidos(evaluaciones, EvaluacionDeIncidenteDTO::reconocimiento);
+        List<Long> tiemposDeResolucion = segundosMedidos(evaluaciones, EvaluacionDeIncidenteDTO::resolucion);
+        long inconsistentes = evaluaciones
+            .stream()
+            .filter(
+                evaluacion ->
+                    evaluacion.reconocimiento().estado() == EstadoMedicion.INCONSISTENTE ||
+                    evaluacion.resolucion().estado() == EstadoMedicion.INCONSISTENTE
+            )
+            .count();
+
+        return new Resumen(
+            severidad,
+            evaluaciones.size(),
+            tiemposDeReconocimiento.size(),
+            tiemposDeResolucion.size(),
+            inconsistentes,
+            promedioEnMinutos(tiemposDeReconocimiento),
+            promedioEnMinutos(tiemposDeResolucion),
+            porcentajeDeCumplimiento(evaluaciones, EvaluacionDeIncidenteDTO::reconocimiento),
+            porcentajeDeCumplimiento(evaluaciones, EvaluacionDeIncidenteDTO::resolucion)
+        );
+    }
+
     private List<ObjetivoDeServicio> objetivosDe(Collection<Incidente> incidentes) {
         Set<Long> servicioIds = incidentes
             .stream()
@@ -269,5 +337,45 @@ public class MetricasDeIncidenteService {
 
     private static Instant primero(Instant uno, Instant otro) {
         return Stream.of(uno, otro).filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null);
+    }
+
+    private static List<Long> segundosMedidos(
+        List<EvaluacionDeIncidenteDTO> evaluaciones,
+        Function<EvaluacionDeIncidenteDTO, Medicion> medicion
+    ) {
+        return evaluaciones.stream().map(medicion).map(Medicion::segundos).filter(Objects::nonNull).toList();
+    }
+
+    private static Double promedioEnMinutos(List<Long> segundos) {
+        if (segundos.isEmpty()) {
+            return null;
+        }
+        double promedio = segundos.stream().mapToLong(Long::longValue).average().orElseThrow() / 60.0;
+        return redondear(promedio);
+    }
+
+    private static Double porcentajeDeCumplimiento(
+        List<EvaluacionDeIncidenteDTO> evaluaciones,
+        Function<EvaluacionDeIncidenteDTO, Medicion> medicion
+    ) {
+        long cumplidos = contar(evaluaciones, medicion, EstadoMedicion.CUMPLIDO);
+        long juzgados = cumplidos + contar(evaluaciones, medicion, EstadoMedicion.INCUMPLIDO);
+        return juzgados == 0 ? null : redondear((100.0 * cumplidos) / juzgados);
+    }
+
+    private static long contar(
+        List<EvaluacionDeIncidenteDTO> evaluaciones,
+        Function<EvaluacionDeIncidenteDTO, Medicion> medicion,
+        EstadoMedicion estado
+    ) {
+        return evaluaciones
+            .stream()
+            .map(medicion)
+            .filter(m -> m.estado() == estado)
+            .count();
+    }
+
+    private static double redondear(double valor) {
+        return Math.round(valor * 10.0) / 10.0;
     }
 }

@@ -17,6 +17,7 @@ import ar.edu.um.isa.oncall.repository.IncidenteRepository;
 import ar.edu.um.isa.oncall.repository.MetricasDeIncidenteRepository;
 import ar.edu.um.isa.oncall.service.dto.EvaluacionDeIncidenteDTO;
 import ar.edu.um.isa.oncall.service.dto.EvaluacionDeIncidenteDTO.EstadoMedicion;
+import ar.edu.um.isa.oncall.service.dto.ReporteDeMetricasDTO;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -259,8 +260,65 @@ class MetricasDeIncidenteServiceTest {
     }
 
     // ---------------------------------------------------------------------
-    // Casos de borde del servicio
+    // Reporte del periodo
     // ---------------------------------------------------------------------
+
+    @Test
+    @DisplayName("El reporte promedia, abre por severidad y calcula el cumplimiento sobre los que tienen veredicto")
+    void elReportePromediaYAbrePorSeveridad() {
+        Instant ahora = minutos(600);
+        List<Incidente> incidentes = List.of(
+            // SEV1: reconocen en 2 y en 10 minutos (MTTA 6), resuelven en 30 y 50 (MTTR 40)
+            incidente(pagos)
+                .reconocidoEn(minutos(2))
+                .resueltoEn(minutos(30))
+                .estado(EstadoIncidente.RESUELTO),
+            incidente(pagos).reconocidoEn(minutos(10)).resueltoEn(minutos(50)).estado(EstadoIncidente.RESUELTO),
+            // SEV1 inconsistente: queda afuera de los promedios
+            incidente(pagos)
+                .reconocidoEn(minutos(1))
+                .resueltoEn(minutos(-1))
+                .estado(EstadoIncidente.RESUELTO),
+            // SEV2 sin objetivos, todavia abierto
+            incidente(pagos).severidad(Severidad.SEV2)
+        );
+        Instant desde = DETECTADO.minus(Duration.ofDays(1));
+        when(metricasDeIncidenteRepository.buscarDetectadosEntre(desde, ahora)).thenReturn(incidentes);
+        when(metricasDeIncidenteRepository.buscarObjetivos(any(), any())).thenReturn(objetivos);
+
+        ReporteDeMetricasDTO reporte = servicio.reporte(desde, ahora, null, ahora);
+
+        assertThat(reporte.total().incidentes()).isEqualTo(4);
+        assertThat(reporte.total().inconsistentes()).isEqualTo(1);
+        assertThat(reporte.porSeveridad())
+            .extracting(ReporteDeMetricasDTO.Resumen::severidad)
+            .containsExactly(Severidad.SEV1, Severidad.SEV2);
+
+        ReporteDeMetricasDTO.Resumen sev1 = reporte.porSeveridad().get(0);
+        assertThat(sev1.incidentes()).isEqualTo(3);
+        assertThat(sev1.reconocidos()).isEqualTo(3);
+        assertThat(sev1.resueltos()).isEqualTo(2);
+        assertThat(sev1.mttaMinutos()).isEqualTo(4.3); // (2 + 10 + 1) / 3
+        assertThat(sev1.mttrMinutos()).isEqualTo(40.0);
+        assertThat(sev1.cumplimientoReconocimiento()).isEqualTo(66.7); // 2 de 3
+        assertThat(sev1.cumplimientoResolucion()).isEqualTo(100.0); // 2 de 2, el inconsistente no juzga
+
+        ReporteDeMetricasDTO.Resumen sev2 = reporte.porSeveridad().get(1);
+        assertThat(sev2.mttaMinutos()).isNull();
+        assertThat(sev2.cumplimientoReconocimiento()).isNull();
+    }
+
+    @Test
+    @DisplayName("Un periodo sin incidentes da un reporte vacio, sin dividir por cero")
+    void unPeriodoSinIncidentes() {
+        when(metricasDeIncidenteRepository.buscarDetectadosEntre(any(), any())).thenReturn(List.of());
+
+        ReporteDeMetricasDTO reporte = servicio.reporte(DETECTADO, minutos(60), null, minutos(60));
+
+        assertThat(reporte.total().incidentes()).isZero();
+        assertThat(reporte.total().mttaMinutos()).isNull();
+        assertThat(reporte.porSeveridad()).isEmpty();
+    }
 
     @Test
     @DisplayName("Un incidente que no existe da vacio")
