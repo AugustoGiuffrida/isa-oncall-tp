@@ -19,19 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Las acciones de una persona sobre un incidente: reconocer, mitigar, resolver y silenciar.
+ * Las dos acciones de una persona que cortan o pausan el escalamiento: reconocer y silenciar.
  *
- * <p>El ABM generado permite escribir cualquier marca de tiempo a mano; esto es el camino
- * normal, el que respeta la maquina de estados, deja rastro en la linea de tiempo y corta el
- * escalamiento. Cada accion es idempotente: repetirla no cambia nada.</p>
+ * <p>El ABM generado permite escribir {@code reconocidoEn} o {@code silenciadoHasta} a mano;
+ * esto es el camino normal, el que deja rastro en la linea de tiempo. Cada accion es
+ * idempotente: repetirla no cambia nada.</p>
  *
  * <p>La fila del incidente se bloquea igual que en {@link EscalamientoService}: si alguien
  * reconoce justo mientras corre el escalamiento, una de las dos operaciones espera a la otra.
  * O se notifico antes del reconocimiento, o no se notifica.</p>
- *
- * <p>Nunca se inventan marcas: mitigar o resolver sin haber reconocido deja
- * {@code reconocidoEn} vacio. La regla de MTTA lo da por reconocido implicitamente, pero el
- * dato crudo muestra lo que paso.</p>
  */
 @Service
 @Transactional
@@ -49,18 +45,15 @@ public class CicloDeVidaDeIncidenteService {
     private final EscalamientoRepository escalamientoRepository;
     private final EventoDeIncidenteRepository eventoDeIncidenteRepository;
     private final UserRepository userRepository;
-    private final MetricasDeIncidenteService metricasDeIncidenteService;
 
     public CicloDeVidaDeIncidenteService(
         EscalamientoRepository escalamientoRepository,
         EventoDeIncidenteRepository eventoDeIncidenteRepository,
-        UserRepository userRepository,
-        MetricasDeIncidenteService metricasDeIncidenteService
+        UserRepository userRepository
     ) {
         this.escalamientoRepository = escalamientoRepository;
         this.eventoDeIncidenteRepository = eventoDeIncidenteRepository;
         this.userRepository = userRepository;
-        this.metricasDeIncidenteService = metricasDeIncidenteService;
     }
 
     /**
@@ -93,69 +86,6 @@ public class CicloDeVidaDeIncidenteService {
                 registrar(incidente, TipoEvento.CAMBIO_DE_ESTADO, mensaje, ahora);
             }
             return aEstado(incidente, cambio, mensaje);
-        });
-    }
-
-    /**
-     * Mitigar: el impacto se corto, aunque la causa siga ahi. Tambien corta el escalamiento.
-     *
-     * @param incidenteId el incidente.
-     * @param login quien mitiga.
-     * @param ahora el instante de la mitigacion.
-     * @return como quedo, o vacio si el incidente no existe.
-     * @throws TransicionInvalidaException si el incidente ya termino.
-     */
-    public Optional<EstadoDeIncidenteDTO> mitigar(Long incidenteId, String login, Instant ahora) {
-        return escalamientoRepository.bloquear(incidenteId).map(incidente -> {
-            exigirAbierto(incidente, "mitigar");
-            boolean cambio = false;
-            if (incidente.getMitigadoEn() == null) {
-                incidente.setMitigadoEn(ahora);
-                cambio = true;
-            }
-            if (incidente.getEstado() != EstadoIncidente.MITIGADO) {
-                incidente.setEstado(EstadoIncidente.MITIGADO);
-                cambio = true;
-            }
-            String mensaje = cambio ? "Mitigado por " + login + "." : "Ya estaba mitigado: no cambia nada.";
-            if (cambio) {
-                registrar(incidente, TipoEvento.CAMBIO_DE_ESTADO, mensaje, ahora);
-            }
-            return aEstado(incidente, cambio, mensaje);
-        });
-    }
-
-    /**
-     * Resolver: el incidente termino. Ademas de cortar el escalamiento, calcula y guarda si se
-     * cumplieron los objetivos (regla B).
-     *
-     * @param incidenteId el incidente.
-     * @param login quien resuelve.
-     * @param ahora el instante de la resolucion.
-     * @return como quedo, o vacio si el incidente no existe.
-     */
-    public Optional<EstadoDeIncidenteDTO> resolver(Long incidenteId, String login, Instant ahora) {
-        return escalamientoRepository.bloquear(incidenteId).map(incidente -> {
-            if (ESTADOS_TERMINADOS.contains(incidente.getEstado())) {
-                return aEstado(incidente, false, "Ya estaba " + incidente.getEstado() + ": no cambia nada.");
-            }
-            if (incidente.getResueltoEn() == null) {
-                incidente.setResueltoEn(ahora);
-            }
-            incidente.setEstado(EstadoIncidente.RESUELTO);
-            metricasDeIncidenteService.registrarCumplimiento(incidente, ahora);
-
-            String mensaje =
-                "Resuelto por " +
-                login +
-                "." +
-                (incidente.getCumplioObjetivo() == null
-                    ? " No hay veredicto de objetivos."
-                    : incidente.getCumplioObjetivo()
-                      ? " Cumplio sus objetivos."
-                      : " No cumplio sus objetivos.");
-            registrar(incidente, TipoEvento.RESOLUCION, mensaje, ahora);
-            return aEstado(incidente, true, mensaje);
         });
     }
 
@@ -212,13 +142,9 @@ public class CicloDeVidaDeIncidenteService {
         return new EstadoDeIncidenteDTO(
             incidente.getId(),
             incidente.getEstado(),
-            incidente.getDetectadoEn(),
             incidente.getReconocidoEn(),
-            incidente.getMitigadoEn(),
-            incidente.getResueltoEn(),
             incidente.getSilenciadoHasta(),
             incidente.getComandante() != null ? incidente.getComandante().getLogin() : null,
-            incidente.getCumplioObjetivo(),
             cambio,
             mensaje
         );

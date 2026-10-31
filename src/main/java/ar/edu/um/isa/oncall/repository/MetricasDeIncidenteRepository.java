@@ -3,7 +3,6 @@ package ar.edu.um.isa.oncall.repository;
 import ar.edu.um.isa.oncall.domain.Incidente;
 import ar.edu.um.isa.oncall.domain.ObjetivoDeServicio;
 import ar.edu.um.isa.oncall.domain.enumeration.TipoObjetivo;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -27,50 +26,8 @@ public interface MetricasDeIncidenteRepository extends org.springframework.data.
     Optional<Incidente> buscarConServicios(@Param("id") Long id);
 
     /**
-     * Incidentes detectados en el periodo {@code [desde, hasta)}, con sus servicios.
-     *
-     * @param desde inicio del periodo, inclusive.
-     * @param hasta fin del periodo, exclusive.
-     * @return los incidentes del periodo.
-     */
-    @Query(
-        """
-        select distinct incidente from Incidente incidente
-            left join fetch incidente.servicios
-        where incidente.detectadoEn >= :desde and incidente.detectadoEn < :hasta
-        """
-    )
-    List<Incidente> buscarDetectadosEntre(@Param("desde") Instant desde, @Param("hasta") Instant hasta);
-
-    /**
-     * Igual que {@link #buscarDetectadosEntre}, pero solo los que afectaron a un servicio. Se
-     * traen igual todos sus servicios: el objetivo que aplica puede ser el de otro de ellos.
-     *
-     * @param desde inicio del periodo, inclusive.
-     * @param hasta fin del periodo, exclusive.
-     * @param servicioId el servicio afectado.
-     * @return los incidentes del periodo sobre ese servicio.
-     */
-    @Query(
-        """
-        select distinct incidente from Incidente incidente
-            left join fetch incidente.servicios
-        where incidente.detectadoEn >= :desde and incidente.detectadoEn < :hasta
-            and exists (
-                select 1 from Incidente afectado join afectado.servicios servicio
-                where afectado.id = incidente.id and servicio.id = :servicioId
-            )
-        """
-    )
-    List<Incidente> buscarDetectadosEntreSobreServicio(
-        @Param("desde") Instant desde,
-        @Param("hasta") Instant hasta,
-        @Param("servicioId") Long servicioId
-    );
-
-    /**
      * Los objetivos de tiempo de un conjunto de servicios. La severidad se filtra despues, en
-     * la regla, para poder resolver muchos incidentes con una sola consulta.
+     * la regla.
      *
      * @param servicioIds los servicios.
      * @param tipos los tipos de objetivo que se miden.

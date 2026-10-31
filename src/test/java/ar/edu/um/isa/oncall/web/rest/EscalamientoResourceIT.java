@@ -180,15 +180,15 @@ class EscalamientoResourceIT {
 
     @Test
     @Transactional
-    @DisplayName("Resolver deja la marca, corta el escalamiento y no se puede reconocer despues")
-    void resolverCortaYNoSePuedeReconocerDespues() throws Exception {
-        Incidente incidente = incidenteConPolitica();
+    @DisplayName("Un incidente resuelto corta el escalamiento y ya no se puede reconocer")
+    void unIncidenteResueltoCortaYNoSePuedeReconocer() throws Exception {
+        Incidente incidente = em.find(Incidente.class, incidenteConPolitica().getId());
+        incidente.setEstado(EstadoIncidente.RESUELTO);
+        incidente.setResueltoEn(Instant.now());
+        em.flush();
 
-        restMockMvc
-            .perform(post("/api/incidentes/{id}/resolver", incidente.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.estado").value("RESUELTO"))
-            .andExpect(jsonPath("$.resueltoEn").isNotEmpty());
+        restMockMvc.perform(post(API_EJECUTAR)).andExpect(status().isOk());
+        assertThat(notificacionesDe(incidente)).isEmpty();
 
         restMockMvc.perform(post("/api/incidentes/{id}/reconocer", incidente.getId())).andExpect(status().isBadRequest());
 

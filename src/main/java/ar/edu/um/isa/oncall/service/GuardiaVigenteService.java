@@ -11,10 +11,8 @@ import ar.edu.um.isa.oncall.service.dto.GuardiaVigenteDTO.Cobertura;
 import ar.edu.um.isa.oncall.service.dto.GuardiaVigenteDTO.TurnoVigente;
 import java.time.DateTimeException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,9 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
  * </ol>
  *
  * <p>Zonas horarias: los turnos se guardan como {@link Instant}, asi que la resolucion no
- * depende de la zona ni del horario de verano. La zona de la rotacion solo se usa para
- * mostrar la hora local y para interpretar una consulta hecha en hora local
- * ({@link #resolverEnHoraLocal}), que es donde el horario de verano si importa.</p>
+ * depende de la zona ni del horario de verano: un turno que atraviesa el cambio de hora dura
+ * lo que dura en tiempo real. La zona de la rotacion solo se usa para mostrar la hora local.</p>
  */
 @Service
 @Transactional(readOnly = true)
@@ -91,25 +88,6 @@ public class GuardiaVigenteService {
      */
     public Optional<GuardiaVigenteDTO> resolver(Long rotacionId, Instant instante) {
         return rotacionRepository.findById(rotacionId).map(rotacion -> resolver(rotacion, instante).guardia());
-    }
-
-    /**
-     * Igual que {@link #resolver(Long, Instant)}, pero el instante viene en la hora local de la
-     * rotacion. Es lo que pregunta una persona: "quien esta de guardia el martes a las 3".
-     *
-     * <p>El horario de verano hace que algunas horas locales no existan y otras existan dos
-     * veces. Se resuelve como {@link ZonedDateTime#ofLocal}: una hora que no existe (salto hacia
-     * adelante) se corre hacia adelante tanto como dure el salto; una hora que existe dos veces
-     * (atraso) se toma en su primera ocurrencia.</p>
-     *
-     * @param rotacionId la rotacion.
-     * @param horaLocal la hora, sin zona, en la zona de la rotacion.
-     * @return la guardia vigente, o vacio si la rotacion no existe.
-     */
-    public Optional<GuardiaVigenteDTO> resolverEnHoraLocal(Long rotacionId, LocalDateTime horaLocal) {
-        return rotacionRepository
-            .findById(rotacionId)
-            .map(rotacion -> resolver(rotacion, aInstante(horaLocal, zonaDe(rotacion))).guardia());
     }
 
     /**
@@ -181,10 +159,6 @@ public class GuardiaVigenteService {
             motivo.toString().trim()
         );
         return new Resolucion(guardia, primario.getResponsable());
-    }
-
-    static Instant aInstante(LocalDateTime horaLocal, ZoneId zona) {
-        return ZonedDateTime.ofLocal(horaLocal, zona, null).toInstant();
     }
 
     static ZoneId zonaDe(Rotacion rotacion) {

@@ -82,32 +82,6 @@ class GuardiaVigenteResourceIT {
 
     @Test
     @Transactional
-    @DisplayName("La hora local se interpreta en la zona de la rotacion")
-    void laHoraLocalSeInterpretaEnLaZonaDeLaRotacion() throws Exception {
-        Rotacion rotacion = rotacion("America/Argentina/Mendoza");
-        // 09:00 a 17:00 hora de Mendoza = 12:00 a 20:00 UTC
-        turno(rotacion, "admin", "2026-03-10T12:00:00Z", "2026-03-10T20:00:00Z", false);
-
-        restMockMvc
-            .perform(get(API_GUARDIA, rotacion.getId()).param("horaLocal", "2026-03-10T09:30:00"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.instante").value("2026-03-10T12:30:00Z"))
-            .andExpect(jsonPath("$.primario.login").value("admin"));
-    }
-
-    @Test
-    @Transactional
-    @DisplayName("Pedir 'en' y 'horaLocal' a la vez es ambiguo: 400")
-    void pedirLosDosInstantesEsAmbiguo() throws Exception {
-        Rotacion rotacion = rotacion("UTC");
-
-        restMockMvc
-            .perform(get(API_GUARDIA, rotacion.getId()).param("en", "2026-03-10T09:00:00Z").param("horaLocal", "2026-03-10T09:00:00"))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @Transactional
     @DisplayName("Una rotacion que no existe da 404")
     void unaRotacionQueNoExisteDa404() throws Exception {
         restMockMvc.perform(get(API_GUARDIA, Long.MAX_VALUE)).andExpect(status().isNotFound());

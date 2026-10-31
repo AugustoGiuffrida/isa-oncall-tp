@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * Las acciones de una persona sobre un incidente. Aparte de {@link IncidenteResource}, que es
- * el ABM generado.
+ * Reconocer y silenciar un incidente: los cortes del escalamiento que dispara una persona.
+ * Aparte de {@link IncidenteResource}, que es el ABM generado.
  */
 @RestController
 @RequestMapping("/api/incidentes")
@@ -57,31 +57,6 @@ public class CicloDeVidaDeIncidenteResource {
     public ResponseEntity<EstadoDeIncidenteDTO> reconocer(@PathVariable("id") Long id) {
         LOG.debug("REST request para reconocer el Incidente {}", id);
         return ejecutar(() -> cicloDeVidaDeIncidenteService.reconocer(id, usuarioActual(), Instant.now()));
-    }
-
-    /**
-     * {@code POST /api/incidentes/:id/mitigar} : el impacto se corto.
-     *
-     * @param id el incidente.
-     * @return {@code 200} con el incidente, {@code 404} si no existe, {@code 400} si ya termino.
-     */
-    @PostMapping("/{id}/mitigar")
-    public ResponseEntity<EstadoDeIncidenteDTO> mitigar(@PathVariable("id") Long id) {
-        LOG.debug("REST request para mitigar el Incidente {}", id);
-        return ejecutar(() -> cicloDeVidaDeIncidenteService.mitigar(id, usuarioActual(), Instant.now()));
-    }
-
-    /**
-     * {@code POST /api/incidentes/:id/resolver} : el incidente termino. Registra el
-     * cumplimiento de objetivos.
-     *
-     * @param id el incidente.
-     * @return {@code 200} con el incidente, o {@code 404} si no existe.
-     */
-    @PostMapping("/{id}/resolver")
-    public ResponseEntity<EstadoDeIncidenteDTO> resolver(@PathVariable("id") Long id) {
-        LOG.debug("REST request para resolver el Incidente {}", id);
-        return ejecutar(() -> cicloDeVidaDeIncidenteService.resolver(id, usuarioActual(), Instant.now()));
     }
 
     /**

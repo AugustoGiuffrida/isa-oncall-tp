@@ -17,8 +17,6 @@ import ar.edu.um.isa.oncall.repository.RotacionRepository;
 import ar.edu.um.isa.oncall.service.dto.GuardiaVigenteDTO;
 import ar.edu.um.isa.oncall.service.dto.GuardiaVigenteDTO.Cobertura;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -205,7 +203,7 @@ class GuardiaVigenteServiceTest {
     }
 
     // ---------------------------------------------------------------------
-    // Zonas horarias y horario de verano
+    // Zonas horarias
     // ---------------------------------------------------------------------
 
     @Test
@@ -231,24 +229,6 @@ class GuardiaVigenteServiceTest {
         assertThat(guardia.zonaHoraria()).isEqualTo("Z");
         assertThat(guardia.primario().login()).isEqualTo("ana");
         assertThat(guardia.motivo()).contains("no es valida");
-    }
-
-    @Test
-    @DisplayName("Horario de verano, salto hacia adelante: una hora local que no existe se corre hacia adelante")
-    void unaHoraLocalQueNoExisteSeCorreHaciaAdelante() {
-        // 2026-03-08 en Nueva York: a las 02:00 se pasa a las 03:00. Las 02:30 no existen.
-        Instant instante = GuardiaVigenteService.aInstante(LocalDateTime.parse("2026-03-08T02:30:00"), ZoneId.of("America/New_York"));
-
-        assertThat(instante).isEqualTo(Instant.parse("2026-03-08T07:30:00Z")); // 03:30 EDT
-    }
-
-    @Test
-    @DisplayName("Horario de verano, atraso: una hora local que existe dos veces se toma en su primera ocurrencia")
-    void unaHoraLocalRepetidaSeTomaEnSuPrimeraOcurrencia() {
-        // 2026-11-01 en Nueva York: a las 02:00 se vuelve a la 01:00. Las 01:30 pasan dos veces.
-        Instant instante = GuardiaVigenteService.aInstante(LocalDateTime.parse("2026-11-01T01:30:00"), ZoneId.of("America/New_York"));
-
-        assertThat(instante).isEqualTo(Instant.parse("2026-11-01T05:30:00Z")); // 01:30 EDT, no EST
     }
 
     @Test
