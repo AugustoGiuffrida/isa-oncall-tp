@@ -4,12 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { Subscription, combineLatest, filter, tap } from 'rxjs';
+import { Subscription, combineLatest, tap } from 'rxjs';
 
-import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
+import { DEFAULT_SORT_DATA, SORT } from 'app/config/navigation.constants';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { ParseLinks } from 'app/core/util/parse-links.service';
 import { Alert } from 'app/shared/alert/alert';
@@ -17,7 +16,6 @@ import { AlertError } from 'app/shared/alert/alert-error';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { TranslateDirective } from 'app/shared/language';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { EjecucionDeEscalamientoDeleteDialog } from '../delete/ejecucion-de-escalamiento-delete-dialog';
 import { IEjecucionDeEscalamiento } from '../ejecucion-de-escalamiento.model';
 import { EjecucionDeEscalamientoService } from '../service/ejecucion-de-escalamiento.service';
 
@@ -57,7 +55,6 @@ export class EjecucionDeEscalamiento implements OnInit {
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
   protected parseLinks = inject(ParseLinks);
-  protected modalService = inject(NgbModal);
 
   constructor() {
     effect(() => {
@@ -94,18 +91,6 @@ export class EjecucionDeEscalamiento implements OnInit {
 
   loadNextPage(): void {
     this.load();
-  }
-
-  delete(ejecucionDeEscalamiento: IEjecucionDeEscalamiento): void {
-    const modalRef = this.modalService.open(EjecucionDeEscalamientoDeleteDialog, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.ejecucionDeEscalamiento = ejecucionDeEscalamiento;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
-      )
-      .subscribe();
   }
 
   load(): void {

@@ -78,10 +78,6 @@
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
         </button>
-
-        <button type="button" [routerLink]="['/ejecucion-de-escalamiento', ejecucionDeEscalamientoRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
-        </button>
       </div>
     }
   </div>

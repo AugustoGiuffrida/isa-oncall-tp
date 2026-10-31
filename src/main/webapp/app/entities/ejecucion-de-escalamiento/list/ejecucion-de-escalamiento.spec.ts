@@ -1,15 +1,13 @@
 import { MockInstance, afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faEye, faPencilAlt, faPlus, faSort, faSortDown, faSortUp, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { provideTranslateService } from '@ngx-translate/core';
-import { Subject, of } from 'rxjs';
+import { of } from 'rxjs';
 
-import { sampleWithRequiredData } from '../ejecucion-de-escalamiento.test-samples';
 import { EjecucionDeEscalamientoService } from '../service/ejecucion-de-escalamiento.service';
 
 import { EjecucionDeEscalamiento } from './ejecucion-de-escalamiento';
@@ -146,44 +144,5 @@ describe('EjecucionDeEscalamiento Management Component', () => {
     await vitest.runAllTimersAsync();
     expect(comp.ejecucionDeEscalamientos()).toHaveLength(2);
     expect(comp.ejecucionDeEscalamientos()[1]).toEqual(expect.objectContaining({ id: 23926 }));
-  });
-
-  describe('delete', () => {
-    let ngbModal: NgbModal;
-    let deleteModalMock: any;
-
-    beforeEach(() => {
-      deleteModalMock = { componentInstance: {}, closed: new Subject() };
-      // NgbModal is not a singleton using TestBed.inject.
-      // ngbModal = TestBed.inject(NgbModal);
-      ngbModal = (comp as any).modalService;
-      vitest.spyOn(ngbModal, 'open').mockReturnValue(deleteModalMock);
-    });
-
-    it('on confirm should call load', inject([], () => {
-      // GIVEN
-      vitest.spyOn(comp, 'load');
-
-      // WHEN
-      comp.delete(sampleWithRequiredData);
-      deleteModalMock.closed.next('deleted');
-
-      // THEN
-      expect(ngbModal.open).toHaveBeenCalled();
-      expect(comp.load).toHaveBeenCalled();
-    }));
-
-    it('on dismiss should call load', inject([], () => {
-      // GIVEN
-      vitest.spyOn(comp, 'load');
-
-      // WHEN
-      comp.delete(sampleWithRequiredData);
-      deleteModalMock.closed.next();
-
-      // THEN
-      expect(ngbModal.open).toHaveBeenCalled();
-      expect(comp.load).not.toHaveBeenCalled();
-    }));
   });
 });

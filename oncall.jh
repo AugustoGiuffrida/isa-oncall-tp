@@ -193,6 +193,7 @@ entity PasoEscalamiento {
  * Es la auditoria del escalamiento y tambien su memoria: el proceso que
  * despierta mira la ultima fila para saber por donde va.
  */
+@readOnly
 entity EjecucionDeEscalamiento {
   vuelta Integer required min(0) max(5)
   nivel Integer required min(0) max(10)

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs/esm';
 
-import { IEjecucionDeEscalamiento, NewEjecucionDeEscalamiento } from './ejecucion-de-escalamiento.model';
+import { IEjecucionDeEscalamiento } from './ejecucion-de-escalamiento.model';
 
 export const sampleWithRequiredData: IEjecucionDeEscalamiento = {
   id: 9489,
@@ -29,16 +29,6 @@ export const sampleWithFullData: IEjecucionDeEscalamiento = {
   proximoEn: dayjs('2026-10-23T12:34'),
   detalle: 'pfft about',
 };
-
-export const sampleWithNewData: NewEjecucionDeEscalamiento = {
-  vuelta: 5,
-  nivel: 4,
-  resultado: 'SIN_POLITICA',
-  ejecutadoEn: dayjs('2026-10-23T20:39'),
-  id: null,
-};
-
-Object.freeze(sampleWithNewData);
 Object.freeze(sampleWithRequiredData);
 Object.freeze(sampleWithPartialData);
 Object.freeze(sampleWithFullData);

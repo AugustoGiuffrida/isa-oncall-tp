@@ -1,20 +1,9 @@
-import {
-  entityConfirmDeleteButtonSelector,
-  entityCreateButtonSelector,
-  entityCreateCancelButtonSelector,
-  entityCreateSaveButtonSelector,
-  entityDeleteButtonSelector,
-  entityDetailsBackButtonSelector,
-  entityDetailsButtonSelector,
-  entityEditButtonSelector,
-  entityTableSelector,
-} from '../../support/entity';
+import { entityDetailsBackButtonSelector, entityDetailsButtonSelector, entityTableSelector } from '../../support/entity';
 
 describe('EjecucionDeEscalamiento e2e test', () => {
   const ejecucionDeEscalamientoPageUrl = '/ejecucion-de-escalamiento';
   let username: string;
   let password: string;
-  const ejecucionDeEscalamientoSample = { vuelta: 1, nivel: 0, resultado: 'AGOTADO', ejecutadoEn: '2026-10-23T06:06:53.580Z' };
 
   let ejecucionDeEscalamiento;
   let incidente;
@@ -118,56 +107,15 @@ describe('EjecucionDeEscalamiento e2e test', () => {
       cy.getEntityHeading('EjecucionDeEscalamiento').should('not.contain', 'oncallApp.ejecucionDeEscalamiento.home.title');
     });
 
-    describe('create button click', () => {
-      beforeEach(() => {
-        cy.visit(ejecucionDeEscalamientoPageUrl);
-        cy.wait('@entitiesRequest');
-      });
-
-      it('should load create EjecucionDeEscalamiento page', () => {
-        cy.get(entityCreateButtonSelector).click();
-        cy.location('pathname').should('eq', `${ejecucionDeEscalamientoPageUrl}/new`);
-        cy.getEntityCreateUpdateHeading('EjecucionDeEscalamiento');
-        cy.get(entityCreateSaveButtonSelector).should('exist');
-        cy.get(entityCreateCancelButtonSelector).click();
-        cy.wait('@entitiesRequest').then(({ response }) => {
-          expect(response?.statusCode).to.equal(200);
-        });
-        cy.location('pathname').should('eq', ejecucionDeEscalamientoPageUrl);
-      });
-    });
-
     describe('with existing value', () => {
-      beforeEach(() => {
-        cy.authenticatedRequest({
-          method: 'POST',
-          url: '/api/ejecucion-de-escalamientos',
-          body: {
-            ...ejecucionDeEscalamientoSample,
-            incidente,
-          },
-        }).then(({ body }) => {
-          ejecucionDeEscalamiento = body;
-
-          cy.intercept(
-            {
-              method: 'GET',
-              url: '/api/ejecucion-de-escalamientos+(?*|)',
-              times: 1,
-            },
-            {
-              statusCode: 200,
-              headers: {
-                link: '<http://localhost/api/ejecucion-de-escalamientos?page=0&size=20>; rel="last",<http://localhost/api/ejecucion-de-escalamientos?page=0&size=20>; rel="first"',
-              },
-              body: [ejecucionDeEscalamiento],
-            },
-          ).as('entitiesRequestInternal');
-        });
-
+      beforeEach(function () {
         cy.visit(ejecucionDeEscalamientoPageUrl);
 
-        cy.wait('@entitiesRequestInternal');
+        cy.wait('@entitiesRequest').then(({ response }) => {
+          if (response?.body.length === 0) {
+            this.skip();
+          }
+        });
       });
 
       it('detail button click should load details EjecucionDeEscalamiento page', () => {
@@ -179,84 +127,6 @@ describe('EjecucionDeEscalamiento e2e test', () => {
         });
         cy.location('pathname').should('eq', ejecucionDeEscalamientoPageUrl);
       });
-
-      it('edit button click should load edit EjecucionDeEscalamiento page and go back', () => {
-        cy.get(entityEditButtonSelector).first().click();
-        cy.getEntityCreateUpdateHeading('EjecucionDeEscalamiento');
-        cy.get(entityCreateSaveButtonSelector).should('exist');
-        cy.get(entityCreateCancelButtonSelector).click();
-        cy.wait('@entitiesRequest').then(({ response }) => {
-          expect(response?.statusCode).to.equal(200);
-        });
-        cy.location('pathname').should('eq', ejecucionDeEscalamientoPageUrl);
-      });
-
-      it('edit button click should load edit EjecucionDeEscalamiento page and save', () => {
-        cy.get(entityEditButtonSelector).first().click();
-        cy.getEntityCreateUpdateHeading('EjecucionDeEscalamiento');
-        cy.get(entityCreateSaveButtonSelector).click();
-        cy.wait('@entitiesRequest').then(({ response }) => {
-          expect(response?.statusCode).to.equal(200);
-        });
-        cy.location('pathname').should('eq', ejecucionDeEscalamientoPageUrl);
-      });
-
-      it('last delete button click should delete instance of EjecucionDeEscalamiento', () => {
-        cy.get(entityDeleteButtonSelector).last().click();
-        cy.getEntityDeleteDialogHeading('ejecucionDeEscalamiento').should('exist');
-        cy.get(entityConfirmDeleteButtonSelector).click();
-        cy.wait('@deleteEntityRequest').then(({ response }) => {
-          expect(response?.statusCode).to.equal(204);
-        });
-        cy.wait('@entitiesRequest').then(({ response }) => {
-          expect(response?.statusCode).to.equal(200);
-        });
-        cy.location('pathname').should('eq', ejecucionDeEscalamientoPageUrl);
-
-        ejecucionDeEscalamiento = undefined;
-      });
-    });
-  });
-
-  describe('new EjecucionDeEscalamiento page', () => {
-    beforeEach(() => {
-      cy.visit(ejecucionDeEscalamientoPageUrl);
-      cy.get(entityCreateButtonSelector).click();
-      cy.getEntityCreateUpdateHeading('EjecucionDeEscalamiento');
-    });
-
-    it('should create an instance of EjecucionDeEscalamiento', () => {
-      cy.get(`[data-cy="vuelta"]`).type('5');
-      cy.get(`[data-cy="vuelta"]`).should('have.value', '5');
-
-      cy.get(`[data-cy="nivel"]`).type('7');
-      cy.get(`[data-cy="nivel"]`).should('have.value', '7');
-
-      cy.get(`[data-cy="resultado"]`).select('SIN_POLITICA');
-
-      cy.get(`[data-cy="ejecutadoEn"]`).type('2026-10-22T23:13');
-      cy.get(`[data-cy="ejecutadoEn"]`).blur();
-      cy.get(`[data-cy="ejecutadoEn"]`).should('have.value', '2026-10-22T23:13');
-
-      cy.get(`[data-cy="proximoEn"]`).type('2026-10-23T09:34');
-      cy.get(`[data-cy="proximoEn"]`).blur();
-      cy.get(`[data-cy="proximoEn"]`).should('have.value', '2026-10-23T09:34');
-
-      cy.get(`[data-cy="detalle"]`).type('incidentally');
-      cy.get(`[data-cy="detalle"]`).should('have.value', 'incidentally');
-
-      cy.get(`[data-cy="incidente"]`).select(1);
-
-      cy.get(entityCreateSaveButtonSelector).click();
-
-      cy.wait('@postEntityRequest').then(({ response }) => {
-        expect(response?.statusCode).to.equal(201);
-        ejecucionDeEscalamiento = response.body;
-      });
-      cy.wait('@entitiesRequest').then(({ response }) => {
-        expect(response?.statusCode).to.equal(200);
-      });
-      cy.location('pathname').should('eq', ejecucionDeEscalamientoPageUrl);
     });
   });
 });

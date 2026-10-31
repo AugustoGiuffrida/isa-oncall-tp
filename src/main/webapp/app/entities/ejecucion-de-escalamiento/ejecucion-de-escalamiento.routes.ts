@@ -22,22 +22,6 @@ const ejecucionDeEscalamientoRoute: Routes = [
     },
     canActivate: [UserRouteAccessService],
   },
-  {
-    path: 'new',
-    loadComponent: () => import('./update/ejecucion-de-escalamiento-update').then(m => m.EjecucionDeEscalamientoUpdate),
-    resolve: {
-      ejecucionDeEscalamiento: EjecucionDeEscalamientoResolve,
-    },
-    canActivate: [UserRouteAccessService],
-  },
-  {
-    path: ':id/edit',
-    loadComponent: () => import('./update/ejecucion-de-escalamiento-update').then(m => m.EjecucionDeEscalamientoUpdate),
-    resolve: {
-      ejecucionDeEscalamiento: EjecucionDeEscalamientoResolve,
-    },
-    canActivate: [UserRouteAccessService],
-  },
 ];
 
 export default ejecucionDeEscalamientoRoute;

@@ -7,16 +7,6 @@
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
         <span jhiTranslate="oncallApp.ejecucionDeEscalamiento.home.refreshListLabel">Refrescar lista</span>
       </button>
-
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-ejecucion-de-escalamiento"
-        [routerLink]="['/ejecucion-de-escalamiento/new']"
-      >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="oncallApp.ejecucionDeEscalamiento.home.createLabel">Crear nuevo Ejecucion De Escalamiento</span>
-      </button>
     </div>
   </h2>
 
@@ -156,25 +146,6 @@
                     <fa-icon icon="eye" />
                     <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
                   </a>
-
-                  <a
-                    [routerLink]="['/ejecucion-de-escalamiento', ejecucionDeEscalamiento.id, 'edit']"
-                    class="btn btn-primary btn-sm"
-                    data-cy="entityEditButton"
-                  >
-                    <fa-icon icon="pencil-alt" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
-                  </a>
-
-                  <button
-                    type="submit"
-                    (click)="delete(ejecucionDeEscalamiento)"
-                    class="btn btn-danger btn-sm"
-                    data-cy="entityDeleteButton"
-                  >
-                    <fa-icon icon="times" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
-                  </button>
                 </div>
               </td>
             </tr>

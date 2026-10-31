@@ -3,12 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import { IEjecucionDeEscalamiento } from '../ejecucion-de-escalamiento.model';
-import {
-  sampleWithFullData,
-  sampleWithNewData,
-  sampleWithPartialData,
-  sampleWithRequiredData,
-} from '../ejecucion-de-escalamiento.test-samples';
+import { sampleWithFullData, sampleWithPartialData, sampleWithRequiredData } from '../ejecucion-de-escalamiento.test-samples';
 
 import { EjecucionDeEscalamientoService, RestEjecucionDeEscalamiento } from './ejecucion-de-escalamiento.service';
 
@@ -44,42 +39,6 @@ describe('EjecucionDeEscalamiento Service', () => {
       expect(expectedResult).toMatchObject(expected);
     });
 
-    it('should create a EjecucionDeEscalamiento', () => {
-      const ejecucionDeEscalamiento = { ...sampleWithNewData };
-      const returnedFromService = { ...requireRestSample };
-      const expected = { ...sampleWithRequiredData };
-
-      service.create(ejecucionDeEscalamiento).subscribe(resp => (expectedResult = resp));
-
-      const req = httpMock.expectOne({ method: 'POST' });
-      req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
-    });
-
-    it('should update a EjecucionDeEscalamiento', () => {
-      const ejecucionDeEscalamiento = { ...sampleWithRequiredData };
-      const returnedFromService = { ...requireRestSample };
-      const expected = { ...sampleWithRequiredData };
-
-      service.update(ejecucionDeEscalamiento).subscribe(resp => (expectedResult = resp));
-
-      const req = httpMock.expectOne({ method: 'PUT' });
-      req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
-    });
-
-    it('should partial update a EjecucionDeEscalamiento', () => {
-      const patchObject = { ...sampleWithPartialData };
-      const returnedFromService = { ...requireRestSample };
-      const expected = { ...sampleWithRequiredData };
-
-      service.partialUpdate(patchObject).subscribe(resp => (expectedResult = resp));
-
-      const req = httpMock.expectOne({ method: 'PATCH' });
-      req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
-    });
-
     it('should return a list of EjecucionDeEscalamiento', () => {
       const returnedFromService = { ...requireRestSample };
 
@@ -91,13 +50,6 @@ describe('EjecucionDeEscalamiento Service', () => {
       req.flush([returnedFromService]);
       httpMock.verify();
       expect(expectedResult).toMatchObject([expected]);
-    });
-
-    it('should delete a EjecucionDeEscalamiento', () => {
-      service.delete(123).subscribe();
-
-      const requests = httpMock.match({ method: 'DELETE' });
-      expect(requests).toHaveLength(1);
     });
 
     describe('addEjecucionDeEscalamientoToCollectionIfMissing', () => {

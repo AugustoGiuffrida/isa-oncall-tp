@@ -17,5 +17,3 @@ export interface IEjecucionDeEscalamiento {
   paso?: Pick<IPasoEscalamiento, 'id' | 'orden'> | null;
   destinatario?: Pick<IUser, 'id' | 'login'> | null;
 }
-
-export type NewEjecucionDeEscalamiento = Omit<IEjecucionDeEscalamiento, 'id'> & { id: null };
