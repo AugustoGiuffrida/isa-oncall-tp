@@ -177,6 +177,38 @@ class MantenimientoVigenteServiceTest {
         assertThat(cubre(ventana, "2026-03-17T05:30:00Z")).isTrue();
     }
 
+    @Test
+    @DisplayName("Si dos ocurrencias de la misma ventana se solapan, informa la que termina mas tarde")
+    void dentroDeUnaVentanaGanaLaOcurrenciaQueTerminaMasTarde() {
+        // diaria de 30 horas: la del 10 (02:00 del 10 a 08:00 del 11) y la del 11 se pisan
+        VentanaDeMantenimiento ventana = ventana(Recurrencia.DIARIA, "2026-03-10T05:00:00Z", "2026-03-11T11:00:00Z");
+
+        Optional<MantenimientoVigenteService.Ocurrencia> ocurrencia = MantenimientoVigenteService.ocurrenciaQueCubre(
+            ventana,
+            Instant.parse("2026-03-11T06:00:00Z")
+        );
+
+        assertThat(ocurrencia).isPresent();
+        assertThat(ocurrencia.orElseThrow().hasta()).isEqualTo(Instant.parse("2026-03-12T11:00:00Z"));
+    }
+
+    @Test
+    @DisplayName("Si una reprogramacion pisa otra ocurrencia de la misma ventana, informa la que termina mas tarde")
+    void unaReprogramacionQuePisaOtraOcurrencia() {
+        VentanaDeMantenimiento ventana = martesDeDosACuatro(Recurrencia.SEMANAL);
+        // la del 17 se mueve al 24 de 05:30 a 06:45 UTC, dentro de la ocurrencia regular del 24 (05:00 a 07:00)
+        excepcion(ventana, "2026-03-17", TipoExcepcionDeVentana.REPROGRAMADA, "2026-03-24T05:30:00Z", "2026-03-24T06:45:00Z");
+
+        Optional<MantenimientoVigenteService.Ocurrencia> ocurrencia = MantenimientoVigenteService.ocurrenciaQueCubre(
+            ventana,
+            Instant.parse("2026-03-24T06:30:00Z")
+        );
+
+        assertThat(ocurrencia).isPresent();
+        assertThat(ocurrencia.orElseThrow().hasta()).isEqualTo(Instant.parse("2026-03-24T07:00:00Z"));
+        assertThat(ocurrencia.orElseThrow().reprogramada()).isFalse();
+    }
+
     // ---------------------------------------------------------------------
     // Varias ventanas
     // ---------------------------------------------------------------------

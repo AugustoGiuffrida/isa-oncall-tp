@@ -14,7 +14,9 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -121,7 +123,9 @@ public class MantenimientoVigenteService {
 
     /**
      * La regla propiamente dicha, sin base de datos: la ocurrencia de la ventana que cubre el
-     * instante, si hay una.
+     * instante, si hay una. Si hay varias (una ventana que dura mas que su periodo, o una
+     * reprogramacion que pisa otra ocurrencia), la que termina mas tarde, igual que entre
+     * ventanas distintas.
      */
     static Optional<Ocurrencia> ocurrenciaQueCubre(VentanaDeMantenimiento ventana, Instant instante) {
         if (ventana.getDesde() == null || ventana.getHasta() == null || !ventana.getHasta().isAfter(ventana.getDesde())) {
@@ -135,7 +139,9 @@ public class MantenimientoVigenteService {
         ZoneOffset offsetInicio = ventana.getDesde().atZone(zona).getOffset();
         ZoneOffset offsetFin = ventana.getHasta().atZone(zona).getOffset();
 
-        // una ocurrencia movida puede caer en cualquier lado: se mira primero
+        List<Ocurrencia> queCubren = new ArrayList<>();
+
+        // una ocurrencia movida puede caer en cualquier lado
         for (ExcepcionDeVentana excepcion : ventana.getExcepcions()) {
             if (
                 excepcion.getTipo() == TipoExcepcionDeVentana.REPROGRAMADA &&
@@ -144,7 +150,7 @@ public class MantenimientoVigenteService {
                 excepcion.getNuevoHasta() != null &&
                 cubre(excepcion.getNuevoDesde(), excepcion.getNuevoHasta(), instante)
             ) {
-                return Optional.of(new Ocurrencia(excepcion.getNuevoDesde(), excepcion.getNuevoHasta(), true));
+                queCubren.add(new Ocurrencia(excepcion.getNuevoDesde(), excepcion.getNuevoHasta(), true));
             }
         }
 
@@ -165,10 +171,10 @@ public class MantenimientoVigenteService {
                 offsetFin
             ).toInstant();
             if (cubre(desde, hasta, instante)) {
-                return Optional.of(new Ocurrencia(desde, hasta, false));
+                queCubren.add(new Ocurrencia(desde, hasta, false));
             }
         }
-        return Optional.empty();
+        return queCubren.stream().max(Comparator.comparing(Ocurrencia::hasta));
     }
 
     /**
