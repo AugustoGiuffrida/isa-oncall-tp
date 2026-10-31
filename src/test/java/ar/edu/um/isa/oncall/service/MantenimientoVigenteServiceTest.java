@@ -126,6 +126,17 @@ class MantenimientoVigenteServiceTest {
         assertThat(cubre(ventana, "2026-03-15T07:30:00Z")).isFalse();
     }
 
+    @Test
+    @DisplayName("Horario de verano: una ventana en la hora que se repite (atraso de otoño) no se corre a la otra")
+    void unaVentanaEnLaHoraRepetidaNoSeCorre() {
+        // el 1 de noviembre de 2026 en Nueva York la 01:15 pasa dos veces: 05:15Z (EDT) y 06:15Z (EST)
+        VentanaDeMantenimiento ventana = ventana(Recurrencia.UNICA, "2026-11-01T06:15:00Z", "2026-11-01T06:45:00Z");
+        ventana.setZonaHoraria("America/New_York");
+
+        assertThat(cubre(ventana, "2026-11-01T06:30:00Z")).isTrue();
+        assertThat(cubre(ventana, "2026-11-01T05:30:00Z")).isFalse();
+    }
+
     // ---------------------------------------------------------------------
     // Excepciones
     // ---------------------------------------------------------------------

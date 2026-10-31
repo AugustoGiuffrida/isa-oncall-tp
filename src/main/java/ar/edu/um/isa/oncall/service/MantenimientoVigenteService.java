@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
  * recurrencia. Las siguientes ocurrencias repiten la primera <em>en hora local</em> de la zona
  * de la ventana: "de 2 a 4" sigue siendo de 2 a 4 despues del cambio de hora, aunque eso sean
  * otros instantes UTC. Si la hora local no existe ese dia (salto de primavera), se corre hacia
- * adelante lo que dura el salto, como {@link ZonedDateTime#ofLocal}.</p>
+ * adelante lo que dura el salto, como {@link ZonedDateTime#ofLocal}. Si existe dos veces
+ * (atraso de otoño), se toma la que tiene el mismo offset que la primera ocurrencia: asi una
+ * ventana cargada en la segunda 01:15 sigue siendo la segunda 01:15.</p>
  *
  * <p>Una excepcion afecta a la ocurrencia que empezaba en su {@code fecha} (local):
  * {@code CANCELADA} la anula y {@code REPROGRAMADA} la reemplaza por {@code nuevoDesde} /
@@ -129,6 +131,9 @@ public class MantenimientoVigenteService {
         LocalDateTime inicioLocal = ventana.getDesde().atZone(zona).toLocalDateTime();
         LocalDateTime finLocal = ventana.getHasta().atZone(zona).toLocalDateTime();
         LocalDate primeraFecha = inicioLocal.toLocalDate();
+        // el offset original desempata las horas que existen dos veces en el cambio de horario
+        ZoneOffset offsetInicio = ventana.getDesde().atZone(zona).getOffset();
+        ZoneOffset offsetFin = ventana.getHasta().atZone(zona).getOffset();
 
         // una ocurrencia movida puede caer en cualquier lado: se mira primero
         for (ExcepcionDeVentana excepcion : ventana.getExcepcions()) {
@@ -153,8 +158,12 @@ public class MantenimientoVigenteService {
             if (!ocurreEn(ventana, primeraFecha, fecha) || fechasConExcepcion.contains(fecha)) {
                 continue;
             }
-            Instant desde = ZonedDateTime.ofLocal(fecha.atTime(inicioLocal.toLocalTime()), zona, null).toInstant();
-            Instant hasta = ZonedDateTime.ofLocal(fecha.plusDays(diasQueAbarca).atTime(finLocal.toLocalTime()), zona, null).toInstant();
+            Instant desde = ZonedDateTime.ofLocal(fecha.atTime(inicioLocal.toLocalTime()), zona, offsetInicio).toInstant();
+            Instant hasta = ZonedDateTime.ofLocal(
+                fecha.plusDays(diasQueAbarca).atTime(finLocal.toLocalTime()),
+                zona,
+                offsetFin
+            ).toInstant();
             if (cubre(desde, hasta, instante)) {
                 return Optional.of(new Ocurrencia(desde, hasta, false));
             }
