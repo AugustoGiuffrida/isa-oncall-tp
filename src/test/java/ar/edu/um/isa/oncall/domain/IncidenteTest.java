@@ -1,6 +1,7 @@
 package ar.edu.um.isa.oncall.domain;
 
 import static ar.edu.um.isa.oncall.domain.AlertaTestSamples.*;
+import static ar.edu.um.isa.oncall.domain.CorrelacionCambioIncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.EjecucionDeEscalamientoTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.EventoDeIncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.IncidenteTestSamples.*;
@@ -148,5 +149,27 @@ class IncidenteTest {
         incidente.setNotificacions(new HashSet<>());
         assertThat(incidente.getNotificacions()).doesNotContain(notificacionBack);
         assertThat(notificacionBack.getIncidente()).isNull();
+    }
+
+    @Test
+    void correlacionTest() {
+        Incidente incidente = getIncidenteRandomSampleGenerator();
+        CorrelacionCambioIncidente correlacionCambioIncidenteBack = getCorrelacionCambioIncidenteRandomSampleGenerator();
+
+        incidente.addCorrelacion(correlacionCambioIncidenteBack);
+        assertThat(incidente.getCorrelacions()).containsOnly(correlacionCambioIncidenteBack);
+        assertThat(correlacionCambioIncidenteBack.getIncidente()).isEqualTo(incidente);
+
+        incidente.removeCorrelacion(correlacionCambioIncidenteBack);
+        assertThat(incidente.getCorrelacions()).doesNotContain(correlacionCambioIncidenteBack);
+        assertThat(correlacionCambioIncidenteBack.getIncidente()).isNull();
+
+        incidente.correlacions(new HashSet<>(Set.of(correlacionCambioIncidenteBack)));
+        assertThat(incidente.getCorrelacions()).containsOnly(correlacionCambioIncidenteBack);
+        assertThat(correlacionCambioIncidenteBack.getIncidente()).isEqualTo(incidente);
+
+        incidente.setCorrelacions(new HashSet<>());
+        assertThat(incidente.getCorrelacions()).doesNotContain(correlacionCambioIncidenteBack);
+        assertThat(correlacionCambioIncidenteBack.getIncidente()).isNull();
     }
 }

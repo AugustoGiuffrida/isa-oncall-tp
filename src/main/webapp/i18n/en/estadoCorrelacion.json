@@ -1,0 +1,10 @@
+{
+  "oncallApp": {
+    "EstadoCorrelacion": {
+      "null": "",
+      "SUGERIDA": "SUGERIDA",
+      "CONFIRMADA": "CONFIRMADA",
+      "DESCARTADA": "DESCARTADA"
+    }
+  }
+}

@@ -68,6 +68,11 @@ describe('Servicio e2e test', () => {
       body: [],
     });
 
+    cy.intercept('GET', '/api/despliegue-de-servicios', {
+      statusCode: 200,
+      body: [],
+    });
+
     cy.intercept('GET', '/api/incidentes', {
       statusCode: 200,
       body: [],

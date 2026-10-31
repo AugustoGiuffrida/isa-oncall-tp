@@ -82,6 +82,8 @@ public class ServicioCriteria implements Serializable, Criteria {
 
     private LongFilter politicaId;
 
+    private LongFilter despliegueId;
+
     private LongFilter incidenteId;
 
     private Boolean distinct;
@@ -100,6 +102,7 @@ public class ServicioCriteria implements Serializable, Criteria {
         this.objetivoId = other.optionalObjetivoId().map(LongFilter::copy).orElse(null);
         this.alertaId = other.optionalAlertaId().map(LongFilter::copy).orElse(null);
         this.politicaId = other.optionalPoliticaId().map(LongFilter::copy).orElse(null);
+        this.despliegueId = other.optionalDespliegueId().map(LongFilter::copy).orElse(null);
         this.incidenteId = other.optionalIncidenteId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -318,6 +321,25 @@ public class ServicioCriteria implements Serializable, Criteria {
         this.politicaId = politicaId;
     }
 
+    public LongFilter getDespliegueId() {
+        return despliegueId;
+    }
+
+    public Optional<LongFilter> optionalDespliegueId() {
+        return Optional.ofNullable(despliegueId);
+    }
+
+    public LongFilter despliegueId() {
+        if (despliegueId == null) {
+            setDespliegueId(new LongFilter());
+        }
+        return despliegueId;
+    }
+
+    public void setDespliegueId(LongFilter despliegueId) {
+        this.despliegueId = despliegueId;
+    }
+
     public LongFilter getIncidenteId() {
         return incidenteId;
     }
@@ -377,6 +399,7 @@ public class ServicioCriteria implements Serializable, Criteria {
             Objects.equals(objetivoId, that.objetivoId) &&
             Objects.equals(alertaId, that.alertaId) &&
             Objects.equals(politicaId, that.politicaId) &&
+            Objects.equals(despliegueId, that.despliegueId) &&
             Objects.equals(incidenteId, that.incidenteId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -396,6 +419,7 @@ public class ServicioCriteria implements Serializable, Criteria {
             objetivoId,
             alertaId,
             politicaId,
+            despliegueId,
             incidenteId,
             distinct
         );
@@ -416,6 +440,7 @@ public class ServicioCriteria implements Serializable, Criteria {
             optionalObjetivoId().map(f -> "objetivoId=" + f + ", ").orElse("") +
             optionalAlertaId().map(f -> "alertaId=" + f + ", ").orElse("") +
             optionalPoliticaId().map(f -> "politicaId=" + f + ", ").orElse("") +
+            optionalDespliegueId().map(f -> "despliegueId=" + f + ", ").orElse("") +
             optionalIncidenteId().map(f -> "incidenteId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";

@@ -46,7 +46,7 @@ public class PoliticaEscalamiento implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "incidentes" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "despliegues", "incidentes" }, allowSetters = true)
     private Servicio servicio;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "politica")

@@ -93,6 +93,9 @@ public class ServicioQueryService extends QueryService<Servicio> {
                     buildSpecification(criteria.getPoliticaId(), root ->
                         root.join(Servicio_.politicas, JoinType.LEFT).get(PoliticaEscalamiento_.id)
                     ),
+                    buildSpecification(criteria.getDespliegueId(), root ->
+                        root.join(Servicio_.despliegues, JoinType.LEFT).get(DespliegueDeServicio_.id)
+                    ),
                     buildSpecification(criteria.getIncidenteId(), root -> root.join(Servicio_.incidentes, JoinType.LEFT).get(Incidente_.id))
                 )
             );

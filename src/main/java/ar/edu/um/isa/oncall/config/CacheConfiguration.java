@@ -51,6 +51,7 @@ public class CacheConfiguration {
             createCache(cm, ar.edu.um.isa.oncall.domain.Servicio.class.getName() + ".objetivos");
             createCache(cm, ar.edu.um.isa.oncall.domain.Servicio.class.getName() + ".alertas");
             createCache(cm, ar.edu.um.isa.oncall.domain.Servicio.class.getName() + ".politicas");
+            createCache(cm, ar.edu.um.isa.oncall.domain.Servicio.class.getName() + ".despliegues");
             createCache(cm, ar.edu.um.isa.oncall.domain.Servicio.class.getName() + ".incidentes");
             createCache(cm, ar.edu.um.isa.oncall.domain.ObjetivoDeServicio.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.Alerta.class.getName());
@@ -60,6 +61,7 @@ public class CacheConfiguration {
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".eventos");
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".ejecucionDeEscalamientos");
             createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".notificacions");
+            createCache(cm, ar.edu.um.isa.oncall.domain.Incidente.class.getName() + ".correlacions");
             createCache(cm, ar.edu.um.isa.oncall.domain.EventoDeIncidente.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.Rotacion.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.Rotacion.class.getName() + ".turnos");
@@ -74,6 +76,11 @@ public class CacheConfiguration {
             createCache(cm, ar.edu.um.isa.oncall.domain.Postmortem.class.getName() + ".accions");
             createCache(cm, ar.edu.um.isa.oncall.domain.AccionCorrectiva.class.getName());
             createCache(cm, ar.edu.um.isa.oncall.domain.EjecucionDeEscalamiento.class.getName());
+            createCache(cm, ar.edu.um.isa.oncall.domain.Cambio.class.getName());
+            createCache(cm, ar.edu.um.isa.oncall.domain.Cambio.class.getName() + ".despliegues");
+            createCache(cm, ar.edu.um.isa.oncall.domain.DespliegueDeServicio.class.getName());
+            createCache(cm, ar.edu.um.isa.oncall.domain.DespliegueDeServicio.class.getName() + ".correlacions");
+            createCache(cm, ar.edu.um.isa.oncall.domain.CorrelacionCambioIncidente.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

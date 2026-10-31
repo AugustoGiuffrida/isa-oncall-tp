@@ -60,7 +60,16 @@ public class Postmortem implements Serializable {
     private Instant publicadoEn;
 
     @JsonIgnoreProperties(
-        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        value = {
+            "comandante",
+            "servicios",
+            "postmortem",
+            "alertas",
+            "eventos",
+            "ejecucionDeEscalamientos",
+            "notificacions",
+            "correlacions",
+        },
         allowSetters = true
     )
     @OneToOne(fetch = FetchType.LAZY, optional = false)

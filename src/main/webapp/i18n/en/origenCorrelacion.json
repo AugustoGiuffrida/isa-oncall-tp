@@ -1,0 +1,9 @@
+{
+  "oncallApp": {
+    "OrigenCorrelacion": {
+      "null": "",
+      "AUTOMATICA": "AUTOMATICA",
+      "MANUAL": "MANUAL"
+    }
+  }
+}

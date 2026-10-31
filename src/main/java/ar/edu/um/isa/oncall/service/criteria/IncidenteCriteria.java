@@ -98,6 +98,8 @@ public class IncidenteCriteria implements Serializable, Criteria {
 
     private LongFilter notificacionId;
 
+    private LongFilter correlacionId;
+
     private Boolean distinct;
 
     public IncidenteCriteria() {}
@@ -122,6 +124,7 @@ public class IncidenteCriteria implements Serializable, Criteria {
         this.eventoId = other.optionalEventoId().map(LongFilter::copy).orElse(null);
         this.ejecucionDeEscalamientoId = other.optionalEjecucionDeEscalamientoId().map(LongFilter::copy).orElse(null);
         this.notificacionId = other.optionalNotificacionId().map(LongFilter::copy).orElse(null);
+        this.correlacionId = other.optionalCorrelacionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -491,6 +494,25 @@ public class IncidenteCriteria implements Serializable, Criteria {
         this.notificacionId = notificacionId;
     }
 
+    public LongFilter getCorrelacionId() {
+        return correlacionId;
+    }
+
+    public Optional<LongFilter> optionalCorrelacionId() {
+        return Optional.ofNullable(correlacionId);
+    }
+
+    public LongFilter correlacionId() {
+        if (correlacionId == null) {
+            setCorrelacionId(new LongFilter());
+        }
+        return correlacionId;
+    }
+
+    public void setCorrelacionId(LongFilter correlacionId) {
+        this.correlacionId = correlacionId;
+    }
+
     public Boolean getDistinct() {
         return distinct;
     }
@@ -539,6 +561,7 @@ public class IncidenteCriteria implements Serializable, Criteria {
             Objects.equals(eventoId, that.eventoId) &&
             Objects.equals(ejecucionDeEscalamientoId, that.ejecucionDeEscalamientoId) &&
             Objects.equals(notificacionId, that.notificacionId) &&
+            Objects.equals(correlacionId, that.correlacionId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -565,6 +588,7 @@ public class IncidenteCriteria implements Serializable, Criteria {
             eventoId,
             ejecucionDeEscalamientoId,
             notificacionId,
+            correlacionId,
             distinct
         );
     }
@@ -592,6 +616,7 @@ public class IncidenteCriteria implements Serializable, Criteria {
             optionalEventoId().map(f -> "eventoId=" + f + ", ").orElse("") +
             optionalEjecucionDeEscalamientoId().map(f -> "ejecucionDeEscalamientoId=" + f + ", ").orElse("") +
             optionalNotificacionId().map(f -> "notificacionId=" + f + ", ").orElse("") +
+            optionalCorrelacionId().map(f -> "correlacionId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

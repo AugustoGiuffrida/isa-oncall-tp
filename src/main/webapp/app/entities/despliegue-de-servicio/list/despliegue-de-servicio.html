@@ -1,0 +1,126 @@
+<div>
+  <h2 id="page-heading" data-cy="DespliegueDeServicioHeading">
+    <span jhiTranslate="oncallApp.despliegueDeServicio.home.title">Despliegue De Servicios</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="oncallApp.despliegueDeServicio.home.refreshListLabel">Refrescar lista</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-despliegue-de-servicio"
+        [routerLink]="['/despliegue-de-servicio/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="oncallApp.despliegueDeServicio.home.createLabel">Crear nuevo Despliegue De Servicio</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (despliegueDeServicios().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="oncallApp.despliegueDeServicio.home.notFound">Ningún Despliegue De Servicios encontrado</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="version">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.despliegueDeServicio.version">Version</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="desplegadoEn">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.despliegueDeServicio.desplegadoEn">Desplegado En</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="cambio.titulo">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.despliegueDeServicio.cambio">Cambio</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="servicio.nombre">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.despliegueDeServicio.servicio">Servicio</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (despliegueDeServicio of despliegueDeServicios(); track trackId(despliegueDeServicio)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/despliegue-de-servicio', despliegueDeServicio.id, 'view']">{{ despliegueDeServicio.id }}</a>
+              </td>
+              <td>{{ despliegueDeServicio.version }}</td>
+              <td>{{ despliegueDeServicio.desplegadoEn | formatMediumDatetime }}</td>
+              <td>
+                @if (despliegueDeServicio.cambio) {
+                  <div>
+                    <a [routerLink]="['/cambio', despliegueDeServicio.cambio.id, 'view']">{{ despliegueDeServicio.cambio.titulo }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (despliegueDeServicio.servicio) {
+                  <div>
+                    <a [routerLink]="['/servicio', despliegueDeServicio.servicio.id, 'view']">{{ despliegueDeServicio.servicio.nombre }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/despliegue-de-servicio', despliegueDeServicio.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/despliegue-de-servicio', despliegueDeServicio.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(despliegueDeServicio)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

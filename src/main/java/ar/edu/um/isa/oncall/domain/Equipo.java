@@ -44,7 +44,7 @@ public class Equipo implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "equipo")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "incidentes" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "despliegues", "incidentes" }, allowSetters = true)
     private Set<Servicio> servicios = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "equipo")

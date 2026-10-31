@@ -1,6 +1,7 @@
 package ar.edu.um.isa.oncall.domain;
 
 import static ar.edu.um.isa.oncall.domain.AlertaTestSamples.*;
+import static ar.edu.um.isa.oncall.domain.DespliegueDeServicioTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.EquipoTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.IncidenteTestSamples.*;
 import static ar.edu.um.isa.oncall.domain.ObjetivoDeServicioTestSamples.*;
@@ -105,6 +106,28 @@ class ServicioTest {
         servicio.setPoliticas(new HashSet<>());
         assertThat(servicio.getPoliticas()).doesNotContain(politicaEscalamientoBack);
         assertThat(politicaEscalamientoBack.getServicio()).isNull();
+    }
+
+    @Test
+    void despliegueTest() {
+        Servicio servicio = getServicioRandomSampleGenerator();
+        DespliegueDeServicio despliegueDeServicioBack = getDespliegueDeServicioRandomSampleGenerator();
+
+        servicio.addDespliegue(despliegueDeServicioBack);
+        assertThat(servicio.getDespliegues()).containsOnly(despliegueDeServicioBack);
+        assertThat(despliegueDeServicioBack.getServicio()).isEqualTo(servicio);
+
+        servicio.removeDespliegue(despliegueDeServicioBack);
+        assertThat(servicio.getDespliegues()).doesNotContain(despliegueDeServicioBack);
+        assertThat(despliegueDeServicioBack.getServicio()).isNull();
+
+        servicio.despliegues(new HashSet<>(Set.of(despliegueDeServicioBack)));
+        assertThat(servicio.getDespliegues()).containsOnly(despliegueDeServicioBack);
+        assertThat(despliegueDeServicioBack.getServicio()).isEqualTo(servicio);
+
+        servicio.setDespliegues(new HashSet<>());
+        assertThat(servicio.getDespliegues()).doesNotContain(despliegueDeServicioBack);
+        assertThat(despliegueDeServicioBack.getServicio()).isNull();
     }
 
     @Test

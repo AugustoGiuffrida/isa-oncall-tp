@@ -1,0 +1,29 @@
+{
+  "oncallApp": {
+    "cambio": {
+      "home": {
+        "title": "Cambios",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Cambio",
+        "createOrEditLabel": "Crear o editar Cambio",
+        "notFound": "Ningún Cambios encontrado"
+      },
+      "created": "Un nuevo Cambio ha sido creado con el identificador {{ param }}",
+      "updated": "Un Cambio ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Cambio ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Cambio {{ id }}?"
+      },
+      "detail": {
+        "title": "Cambio"
+      },
+      "id": "ID",
+      "titulo": "Titulo",
+      "descripcion": "Descripcion",
+      "ticketUrl": "Ticket Url",
+      "creadoEn": "Creado En",
+      "autor": "Autor",
+      "despliegue": "Despliegue"
+    }
+  }
+}

@@ -28,6 +28,7 @@
       "objetivo": "Objetivo",
       "alerta": "Alerta",
       "politica": "Politica",
+      "despliegue": "Despliegue",
       "incidente": "Incidente"
     }
   }

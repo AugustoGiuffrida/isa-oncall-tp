@@ -77,10 +77,24 @@ public class Servicio implements Serializable {
     @JsonIgnoreProperties(value = { "servicio", "pasos" }, allowSetters = true)
     private Set<PoliticaEscalamiento> politicas = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "servicio")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "cambio", "servicio", "correlacions" }, allowSetters = true)
+    private Set<DespliegueDeServicio> despliegues = new HashSet<>();
+
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "servicios")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(
-        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        value = {
+            "comandante",
+            "servicios",
+            "postmortem",
+            "alertas",
+            "eventos",
+            "ejecucionDeEscalamientos",
+            "notificacions",
+            "correlacions",
+        },
         allowSetters = true
     )
     private Set<Incidente> incidentes = new HashSet<>();
@@ -281,6 +295,37 @@ public class Servicio implements Serializable {
     public Servicio removePolitica(PoliticaEscalamiento politicaEscalamiento) {
         this.politicas.remove(politicaEscalamiento);
         politicaEscalamiento.setServicio(null);
+        return this;
+    }
+
+    public Set<DespliegueDeServicio> getDespliegues() {
+        return this.despliegues;
+    }
+
+    public void setDespliegues(Set<DespliegueDeServicio> despliegueDeServicios) {
+        if (this.despliegues != null) {
+            this.despliegues.forEach(i -> i.setServicio(null));
+        }
+        if (despliegueDeServicios != null) {
+            despliegueDeServicios.forEach(i -> i.setServicio(this));
+        }
+        this.despliegues = despliegueDeServicios;
+    }
+
+    public Servicio despliegues(Set<DespliegueDeServicio> despliegueDeServicios) {
+        this.setDespliegues(despliegueDeServicios);
+        return this;
+    }
+
+    public Servicio addDespliegue(DespliegueDeServicio despliegueDeServicio) {
+        this.despliegues.add(despliegueDeServicio);
+        despliegueDeServicio.setServicio(this);
+        return this;
+    }
+
+    public Servicio removeDespliegue(DespliegueDeServicio despliegueDeServicio) {
+        this.despliegues.remove(despliegueDeServicio);
+        despliegueDeServicio.setServicio(null);
         return this;
     }
 

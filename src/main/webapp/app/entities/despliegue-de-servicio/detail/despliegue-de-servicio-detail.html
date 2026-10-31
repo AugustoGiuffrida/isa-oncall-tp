@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (despliegueDeServicio(); as despliegueDeServicioRef) {
+      <div>
+        <h2 data-cy="despliegueDeServicioDetailsHeading">
+          <span jhiTranslate="oncallApp.despliegueDeServicio.detail.title">Despliegue De Servicio</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ despliegueDeServicioRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.despliegueDeServicio.version">Version</span></dt>
+          <dd>
+            <span>{{ despliegueDeServicioRef.version }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.despliegueDeServicio.desplegadoEn">Desplegado En</span></dt>
+          <dd>
+            <span>{{ despliegueDeServicioRef.desplegadoEn | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.despliegueDeServicio.cambio">Cambio</span></dt>
+          <dd>
+            @if (despliegueDeServicio()!.cambio) {
+              <div>
+                <a [routerLink]="['/cambio', despliegueDeServicio()!.cambio?.id, 'view']">{{ despliegueDeServicioRef.cambio?.titulo }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="oncallApp.despliegueDeServicio.servicio">Servicio</span></dt>
+          <dd>
+            @if (despliegueDeServicio()!.servicio) {
+              <div>
+                <a [routerLink]="['/servicio', despliegueDeServicio()!.servicio?.id, 'view']">{{
+                  despliegueDeServicioRef.servicio?.nombre
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/despliegue-de-servicio', despliegueDeServicioRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

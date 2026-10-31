@@ -26,12 +26,15 @@
       "Notificacion",
       "Postmortem",
       "AccionCorrectiva",
-      "EjecucionDeEscalamiento"
+      "EjecucionDeEscalamiento",
+      "Cambio",
+      "DespliegueDeServicio",
+      "CorrelacionCambioIncidente"
     ],
     "jhipsterVersion": "9.2.0",
     "jwtSecretKey": "MzUzMTJkOGZkOTc2N2FhMWY4Y2I2YzgxMTA4MmRhNWEyYjY1ZDMyY2VlMDlkMmYwNDE0NjQ2MWE1YzhjZDNjOWYwYzg1M2M1ZGU4N2JhNDYyMWY0NGQ0MjMwMjdhMGE3YTZiMzNlNmM1ODU1YTA0M2IwZmI5NGJmZjkzMDgwZmI=",
     "languages": ["es", "en"],
-    "lastLiquibaseTimestamp": 1792796758000,
+    "lastLiquibaseTimestamp": 1793454667000,
     "nativeLanguage": "es",
     "packageName": "ar.edu.um.isa.oncall",
     "prodDatabaseType": "postgresql",

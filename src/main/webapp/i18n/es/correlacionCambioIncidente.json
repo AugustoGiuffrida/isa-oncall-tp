@@ -1,0 +1,29 @@
+{
+  "oncallApp": {
+    "correlacionCambioIncidente": {
+      "home": {
+        "title": "Correlacion Cambio Incidentes",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Correlacion Cambio Incidente",
+        "createOrEditLabel": "Crear o editar Correlacion Cambio Incidente",
+        "notFound": "Ningún Correlacion Cambio Incidentes encontrado"
+      },
+      "created": "Un nuevo Correlacion Cambio Incidente ha sido creado con el identificador {{ param }}",
+      "updated": "Un Correlacion Cambio Incidente ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Correlacion Cambio Incidente ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Correlacion Cambio Incidente {{ id }}?"
+      },
+      "detail": {
+        "title": "Correlacion Cambio Incidente"
+      },
+      "id": "ID",
+      "origen": "Origen",
+      "estado": "Estado",
+      "detectadaEn": "Detectada En",
+      "nota": "Nota",
+      "incidente": "Incidente",
+      "despliegue": "Despliegue"
+    }
+  }
+}

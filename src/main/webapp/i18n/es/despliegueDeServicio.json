@@ -1,0 +1,28 @@
+{
+  "oncallApp": {
+    "despliegueDeServicio": {
+      "home": {
+        "title": "Despliegue De Servicios",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Despliegue De Servicio",
+        "createOrEditLabel": "Crear o editar Despliegue De Servicio",
+        "notFound": "Ningún Despliegue De Servicios encontrado"
+      },
+      "created": "Un nuevo Despliegue De Servicio ha sido creado con el identificador {{ param }}",
+      "updated": "Un Despliegue De Servicio ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Despliegue De Servicio ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Despliegue De Servicio {{ id }}?"
+      },
+      "detail": {
+        "title": "Despliegue De Servicio"
+      },
+      "id": "ID",
+      "version": "Version",
+      "desplegadoEn": "Desplegado En",
+      "cambio": "Cambio",
+      "servicio": "Servicio",
+      "correlacion": "Correlacion"
+    }
+  }
+}

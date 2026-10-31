@@ -51,7 +51,7 @@ public class ObjetivoDeServicio implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "incidentes" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "despliegues", "incidentes" }, allowSetters = true)
     private Servicio servicio;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

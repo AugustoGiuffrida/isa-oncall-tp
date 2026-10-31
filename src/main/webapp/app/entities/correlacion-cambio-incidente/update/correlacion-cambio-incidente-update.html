@@ -1,0 +1,174 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-correlacion-cambio-incidente-heading"
+        data-cy="CorrelacionCambioIncidenteCreateUpdateHeading"
+        jhiTranslate="oncallApp.correlacionCambioIncidente.home.createOrEditLabel"
+      >
+        Crear o editar Correlacion Cambio Incidente
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let origenRef = editForm.get('origen')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_origen" jhiTranslate="oncallApp.correlacionCambioIncidente.origen">Origen</label>
+          <select class="form-control" name="origen" formControlName="origen" id="field_origen" data-cy="origen">
+            <option [ngValue]="null">{{ 'oncallApp.OrigenCorrelacion.null' | translate }}</option>
+            @for (origenCorrelacion of origenCorrelacionValues; track $index) {
+              <option [value]="origenCorrelacion">{{ 'oncallApp.OrigenCorrelacion.' + origenCorrelacion | translate }}</option>
+            }
+          </select>
+          @if (origenRef.invalid && (origenRef.dirty || origenRef.touched)) {
+            <div>
+              @if (origenRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let estadoRef = editForm.get('estado')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_estado" jhiTranslate="oncallApp.correlacionCambioIncidente.estado">Estado</label>
+          <select class="form-control" name="estado" formControlName="estado" id="field_estado" data-cy="estado">
+            <option [ngValue]="null">{{ 'oncallApp.EstadoCorrelacion.null' | translate }}</option>
+            @for (estadoCorrelacion of estadoCorrelacionValues; track $index) {
+              <option [value]="estadoCorrelacion">{{ 'oncallApp.EstadoCorrelacion.' + estadoCorrelacion | translate }}</option>
+            }
+          </select>
+          @if (estadoRef.invalid && (estadoRef.dirty || estadoRef.touched)) {
+            <div>
+              @if (estadoRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let detectadaEnRef = editForm.get('detectadaEn')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_detectadaEn" jhiTranslate="oncallApp.correlacionCambioIncidente.detectadaEn"
+            >Detectada En</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_detectadaEn"
+              data-cy="detectadaEn"
+              type="datetime-local"
+              class="form-control"
+              name="detectadaEn"
+              formControlName="detectadaEn"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (detectadaEnRef.invalid && (detectadaEnRef.dirty || detectadaEnRef.touched)) {
+            <div>
+              @if (detectadaEnRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!detectadaEnRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >Este campo debe ser una fecha y hora.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let notaRef = editForm.get('nota')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nota" jhiTranslate="oncallApp.correlacionCambioIncidente.nota">Nota</label>
+          <input type="text" class="form-control" name="nota" id="field_nota" data-cy="nota" formControlName="nota" />
+          @if (notaRef.invalid && (notaRef.dirty || notaRef.touched)) {
+            <div>
+              @if (notaRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+                  >Este campo no puede superar más de 255 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_incidente" jhiTranslate="oncallApp.correlacionCambioIncidente.incidente">Incidente</label>
+          <select
+            class="form-control"
+            id="field_incidente"
+            data-cy="incidente"
+            name="incidente"
+            formControlName="incidente"
+            [compareWith]="compareIncidente"
+          >
+            @if (editForm.get(['incidente'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (incidenteOption of incidentesSharedCollection(); track $index) {
+              <option [ngValue]="incidenteOption">{{ incidenteOption.titulo }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['incidente'])!.invalid && (editForm.get(['incidente'])!.dirty || editForm.get(['incidente'])!.touched)) {
+          <div>
+            @if (editForm.get(['incidente'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_despliegue" jhiTranslate="oncallApp.correlacionCambioIncidente.despliegue">Despliegue</label>
+          <select
+            class="form-control"
+            id="field_despliegue"
+            data-cy="despliegue"
+            name="despliegue"
+            formControlName="despliegue"
+            [compareWith]="compareDespliegueDeServicio"
+          >
+            @if (editForm.get(['despliegue'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (despliegueDeServicioOption of despliegueDeServiciosSharedCollection(); track $index) {
+              <option [ngValue]="despliegueDeServicioOption">{{ despliegueDeServicioOption.version }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['despliegue'])!.invalid && (editForm.get(['despliegue'])!.dirty || editForm.get(['despliegue'])!.touched)) {
+          <div>
+            @if (editForm.get(['despliegue'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -90,6 +90,7 @@ class IncidenteCriteriaTest {
         incidenteCriteria.eventoId();
         incidenteCriteria.ejecucionDeEscalamientoId();
         incidenteCriteria.notificacionId();
+        incidenteCriteria.correlacionId();
         incidenteCriteria.distinct();
     }
 
@@ -115,6 +116,7 @@ class IncidenteCriteriaTest {
                 condition.apply(criteria.getEventoId()) &&
                 condition.apply(criteria.getEjecucionDeEscalamientoId()) &&
                 condition.apply(criteria.getNotificacionId()) &&
+                condition.apply(criteria.getCorrelacionId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -142,6 +144,7 @@ class IncidenteCriteriaTest {
                 condition.apply(criteria.getEventoId(), copy.getEventoId()) &&
                 condition.apply(criteria.getEjecucionDeEscalamientoId(), copy.getEjecucionDeEscalamientoId()) &&
                 condition.apply(criteria.getNotificacionId(), copy.getNotificacionId()) &&
+                condition.apply(criteria.getCorrelacionId(), copy.getCorrelacionId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

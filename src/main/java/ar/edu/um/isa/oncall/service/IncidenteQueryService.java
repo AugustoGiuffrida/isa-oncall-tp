@@ -106,6 +106,9 @@ public class IncidenteQueryService extends QueryService<Incidente> {
                     ),
                     buildSpecification(criteria.getNotificacionId(), root ->
                         root.join(Incidente_.notificacions, JoinType.LEFT).get(Notificacion_.id)
+                    ),
+                    buildSpecification(criteria.getCorrelacionId(), root ->
+                        root.join(Incidente_.correlacions, JoinType.LEFT).get(CorrelacionCambioIncidente_.id)
                     )
                 )
             );

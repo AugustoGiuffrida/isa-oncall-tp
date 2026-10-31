@@ -1,0 +1,78 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (correlacionCambioIncidente(); as correlacionCambioIncidenteRef) {
+      <div>
+        <h2 data-cy="correlacionCambioIncidenteDetailsHeading">
+          <span jhiTranslate="oncallApp.correlacionCambioIncidente.detail.title">Correlacion Cambio Incidente</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ correlacionCambioIncidenteRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.correlacionCambioIncidente.origen">Origen</span></dt>
+          <dd>
+            <span [jhiTranslate]="'oncallApp.OrigenCorrelacion.' + (correlacionCambioIncidenteRef.origen ?? 'null')">{{
+              { null: '', AUTOMATICA: 'AUTOMATICA', MANUAL: 'MANUAL' }[correlacionCambioIncidenteRef.origen ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.correlacionCambioIncidente.estado">Estado</span></dt>
+          <dd>
+            <span [jhiTranslate]="'oncallApp.EstadoCorrelacion.' + (correlacionCambioIncidenteRef.estado ?? 'null')">{{
+              { null: '', SUGERIDA: 'SUGERIDA', CONFIRMADA: 'CONFIRMADA', DESCARTADA: 'DESCARTADA' }[
+                correlacionCambioIncidenteRef.estado ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.correlacionCambioIncidente.detectadaEn">Detectada En</span></dt>
+          <dd>
+            <span>{{ correlacionCambioIncidenteRef.detectadaEn | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.correlacionCambioIncidente.nota">Nota</span></dt>
+          <dd>
+            <span>{{ correlacionCambioIncidenteRef.nota }}</span>
+          </dd>
+          <dt><span jhiTranslate="oncallApp.correlacionCambioIncidente.incidente">Incidente</span></dt>
+          <dd>
+            @if (correlacionCambioIncidente()!.incidente) {
+              <div>
+                <a [routerLink]="['/incidente', correlacionCambioIncidente()!.incidente?.id, 'view']">{{
+                  correlacionCambioIncidenteRef.incidente?.titulo
+                }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="oncallApp.correlacionCambioIncidente.despliegue">Despliegue</span></dt>
+          <dd>
+            @if (correlacionCambioIncidente()!.despliegue) {
+              <div>
+                <a [routerLink]="['/despliegue-de-servicio', correlacionCambioIncidente()!.despliegue?.id, 'view']">{{
+                  correlacionCambioIncidenteRef.despliegue?.version
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button
+          type="button"
+          [routerLink]="['/correlacion-cambio-incidente', correlacionCambioIncidenteRef.id, 'edit']"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

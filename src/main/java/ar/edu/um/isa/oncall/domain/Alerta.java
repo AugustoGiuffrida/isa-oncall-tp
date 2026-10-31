@@ -59,12 +59,21 @@ public class Alerta implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "incidentes" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "equipo", "objetivos", "alertas", "politicas", "despliegues", "incidentes" }, allowSetters = true)
     private Servicio servicio;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
-        value = { "comandante", "servicios", "postmortem", "alertas", "eventos", "ejecucionDeEscalamientos", "notificacions" },
+        value = {
+            "comandante",
+            "servicios",
+            "postmortem",
+            "alertas",
+            "eventos",
+            "ejecucionDeEscalamientos",
+            "notificacions",
+            "correlacions",
+        },
         allowSetters = true
     )
     private Incidente incidente;

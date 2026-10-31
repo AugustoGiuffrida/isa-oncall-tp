@@ -272,6 +272,50 @@ enum EstadoAccion {
 }
 
 // ---------------------------------------------------------------------
+// 5 · GESTION DE CAMBIOS  ·  que se toco antes de que se rompiera
+// ---------------------------------------------------------------------
+
+/**
+ * Un cambio en produccion: un despliegue, una migracion, un cambio de
+ * configuracion. Su autor es a quien se escala primero si el cambio
+ * queda correlacionado con un incidente.
+ */
+entity Cambio {
+  titulo String required maxlength(140)
+  descripcion String maxlength(2000)
+  ticketUrl String maxlength(255)
+  creadoEn Instant required
+}
+
+/**
+ * Cada vez que un cambio llega a un servicio. Es lo que se correlaciona
+ * con los incidentes: el mismo cambio puede desplegarse en varios.
+ */
+entity DespliegueDeServicio {
+  version String required maxlength(60)
+  desplegadoEn Instant required
+}
+
+/**
+ * Sospecha de que un despliegue causo un incidente. La crea la regla de
+ * escalamiento (AUTOMATICA) o una persona (MANUAL); una DESCARTADA no cuenta.
+ */
+entity CorrelacionCambioIncidente {
+  origen OrigenCorrelacion required
+  estado EstadoCorrelacion required
+  detectadaEn Instant required
+  nota String maxlength(255)
+}
+
+enum OrigenCorrelacion {
+  AUTOMATICA, MANUAL
+}
+
+enum EstadoCorrelacion {
+  SUGERIDA, CONFIRMADA, DESCARTADA
+}
+
+// ---------------------------------------------------------------------
 // RELACIONES
 // ---------------------------------------------------------------------
 
@@ -293,6 +337,11 @@ relationship ManyToOne {
 
   Notificacion{incidente(titulo) required} to Incidente{notificacion}
   AccionCorrectiva{postmortem(titulo) required} to Postmortem{accion}
+
+  DespliegueDeServicio{cambio(titulo) required} to Cambio{despliegue}
+  DespliegueDeServicio{servicio(nombre) required} to Servicio{despliegue}
+  CorrelacionCambioIncidente{incidente(titulo) required} to Incidente{correlacion}
+  CorrelacionCambioIncidente{despliegue(version) required} to DespliegueDeServicio{correlacion}
 }
 
 /**
@@ -319,6 +368,7 @@ relationship ManyToOne {
   Notificacion{destinatario(login) required} to User with builtInEntity
   AccionCorrectiva{responsable(login)} to User with builtInEntity
   EjecucionDeEscalamiento{destinatario(login)} to User with builtInEntity
+  Cambio{autor(login) required} to User with builtInEntity
 }
 
 // ---------------------------------------------------------------------

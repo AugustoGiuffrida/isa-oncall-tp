@@ -1,0 +1,139 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-cambio-heading" data-cy="CambioCreateUpdateHeading" jhiTranslate="oncallApp.cambio.home.createOrEditLabel">
+        Crear o editar Cambio
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="global.field.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let tituloRef = editForm.get('titulo')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_titulo" jhiTranslate="oncallApp.cambio.titulo">Titulo</label>
+          <input type="text" class="form-control" name="titulo" id="field_titulo" data-cy="titulo" formControlName="titulo" />
+          @if (tituloRef.invalid && (tituloRef.dirty || tituloRef.touched)) {
+            <div>
+              @if (tituloRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              @if (tituloRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '140' }"
+                  >Este campo no puede superar más de 140 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let descripcionRef = editForm.get('descripcion')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_descripcion" jhiTranslate="oncallApp.cambio.descripcion">Descripcion</label>
+          <input
+            type="text"
+            class="form-control"
+            name="descripcion"
+            id="field_descripcion"
+            data-cy="descripcion"
+            formControlName="descripcion"
+          />
+          @if (descripcionRef.invalid && (descripcionRef.dirty || descripcionRef.touched)) {
+            <div>
+              @if (descripcionRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '2000' }"
+                  >Este campo no puede superar más de 2000 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let ticketUrlRef = editForm.get('ticketUrl')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_ticketUrl" jhiTranslate="oncallApp.cambio.ticketUrl">Ticket Url</label>
+          <input type="text" class="form-control" name="ticketUrl" id="field_ticketUrl" data-cy="ticketUrl" formControlName="ticketUrl" />
+          @if (ticketUrlRef.invalid && (ticketUrlRef.dirty || ticketUrlRef.touched)) {
+            <div>
+              @if (ticketUrlRef.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '255' }"
+                  >Este campo no puede superar más de 255 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        @let creadoEnRef = editForm.get('creadoEn')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_creadoEn" jhiTranslate="oncallApp.cambio.creadoEn">Creado En</label>
+          <div class="d-flex">
+            <input
+              id="field_creadoEn"
+              data-cy="creadoEn"
+              type="datetime-local"
+              class="form-control"
+              name="creadoEn"
+              formControlName="creadoEn"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (creadoEnRef.invalid && (creadoEnRef.dirty || creadoEnRef.touched)) {
+            <div>
+              @if (creadoEnRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!creadoEnRef.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >Este campo debe ser una fecha y hora.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_autor" jhiTranslate="oncallApp.cambio.autor">Autor</label>
+          <select class="form-control" id="field_autor" data-cy="autor" name="autor" formControlName="autor" [compareWith]="compareUser">
+            @if (!editForm.get('autor')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['autor'])!.invalid && (editForm.get(['autor'])!.dirty || editForm.get(['autor'])!.touched)) {
+          <div>
+            @if (editForm.get(['autor'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,161 @@
+<div>
+  <h2 id="page-heading" data-cy="CorrelacionCambioIncidenteHeading">
+    <span jhiTranslate="oncallApp.correlacionCambioIncidente.home.title">Correlacion Cambio Incidentes</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span jhiTranslate="oncallApp.correlacionCambioIncidente.home.refreshListLabel">Refrescar lista</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-correlacion-cambio-incidente"
+        [routerLink]="['/correlacion-cambio-incidente/new']"
+      >
+        <fa-icon icon="plus" />
+        <span jhiTranslate="oncallApp.correlacionCambioIncidente.home.createLabel">Crear nuevo Correlacion Cambio Incidente</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (correlacionCambioIncidentes().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="oncallApp.correlacionCambioIncidente.home.notFound">Ningún Correlacion Cambio Incidentes encontrado</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="origen">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.correlacionCambioIncidente.origen">Origen</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="estado">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.correlacionCambioIncidente.estado">Estado</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="detectadaEn">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.correlacionCambioIncidente.detectadaEn">Detectada En</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nota">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.correlacionCambioIncidente.nota">Nota</span>
+
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="incidente.titulo">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.correlacionCambioIncidente.incidente">Incidente</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="despliegue.version">
+              <div class="d-flex">
+                <span jhiTranslate="oncallApp.correlacionCambioIncidente.despliegue">Despliegue</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (correlacionCambioIncidente of correlacionCambioIncidentes(); track trackId(correlacionCambioIncidente)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/correlacion-cambio-incidente', correlacionCambioIncidente.id, 'view']">{{
+                  correlacionCambioIncidente.id
+                }}</a>
+              </td>
+              <td [jhiTranslate]="'oncallApp.OrigenCorrelacion.' + (correlacionCambioIncidente.origen ?? 'null')">
+                {{ { null: '', AUTOMATICA: 'AUTOMATICA', MANUAL: 'MANUAL' }[correlacionCambioIncidente.origen ?? 'null'] }}
+              </td>
+              <td [jhiTranslate]="'oncallApp.EstadoCorrelacion.' + (correlacionCambioIncidente.estado ?? 'null')">
+                {{
+                  { null: '', SUGERIDA: 'SUGERIDA', CONFIRMADA: 'CONFIRMADA', DESCARTADA: 'DESCARTADA' }[
+                    correlacionCambioIncidente.estado ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ correlacionCambioIncidente.detectadaEn | formatMediumDatetime }}</td>
+              <td>{{ correlacionCambioIncidente.nota }}</td>
+              <td>
+                @if (correlacionCambioIncidente.incidente) {
+                  <div>
+                    <a [routerLink]="['/incidente', correlacionCambioIncidente.incidente.id, 'view']">{{
+                      correlacionCambioIncidente.incidente.titulo
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (correlacionCambioIncidente.despliegue) {
+                  <div>
+                    <a [routerLink]="['/despliegue-de-servicio', correlacionCambioIncidente.despliegue.id, 'view']">{{
+                      correlacionCambioIncidente.despliegue.version
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/correlacion-cambio-incidente', correlacionCambioIncidente.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/correlacion-cambio-incidente', correlacionCambioIncidente.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
+                  </a>
+
+                  <button
+                    type="submit"
+                    (click)="delete(correlacionCambioIncidente)"
+                    class="btn btn-danger btn-sm"
+                    data-cy="entityDeleteButton"
+                  >
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
