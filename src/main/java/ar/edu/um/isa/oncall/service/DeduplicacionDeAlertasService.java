@@ -54,6 +54,12 @@ import org.springframework.transaction.annotation.Transactional;
  * incidente viejo que quedo abierto por olvido. Se configura con
  * {@code oncall.deduplicacion.ventana-minutos}.</p>
  *
+ * <p>Ventanas de mantenimiento (extension 5): si no hay incidente abierto y el servicio esta en
+ * una ventana de mantenimiento, la alerta no abre uno. Se guarda {@code procesada}, sin
+ * incidente y con la ventana que la suprimio en {@code suprimidaPor}. Si ya habia un incidente
+ * abierto, la alerta se le pega igual: la ventana evita incidentes nuevos por trabajo
+ * planificado, no esconde uno que ya existia.</p>
+ *
  * <p>Limite conocido: dos alertas con el mismo fingerprint procesadas en paralelo pueden abrir
  * dos incidentes, porque la deteccion y el alta no son atomicas entre transacciones. Resolverlo
  * pide un indice unico o un lock por fingerprint, y queda fuera del alcance de esta clase.</p>
@@ -79,6 +85,7 @@ public class DeduplicacionDeAlertasService {
     private final IncidenteDeduplicacionRepository incidenteDeduplicacionRepository;
     private final EventoDeIncidenteRepository eventoDeIncidenteRepository;
     private final ServicioRepository servicioRepository;
+    private final MantenimientoVigenteService mantenimientoVigenteService;
 
     private final Duration ventana;
 
@@ -88,6 +95,7 @@ public class DeduplicacionDeAlertasService {
         IncidenteDeduplicacionRepository incidenteDeduplicacionRepository,
         EventoDeIncidenteRepository eventoDeIncidenteRepository,
         ServicioRepository servicioRepository,
+        MantenimientoVigenteService mantenimientoVigenteService,
         @Value("${oncall.deduplicacion.ventana-minutos:" + VENTANA_POR_DEFECTO_MINUTOS + "}") int ventanaMinutos
     ) {
         if (ventanaMinutos < 1) {
@@ -98,6 +106,7 @@ public class DeduplicacionDeAlertasService {
         this.incidenteDeduplicacionRepository = incidenteDeduplicacionRepository;
         this.eventoDeIncidenteRepository = eventoDeIncidenteRepository;
         this.servicioRepository = servicioRepository;
+        this.mantenimientoVigenteService = mantenimientoVigenteService;
         this.ventana = Duration.ofMinutes(ventanaMinutos);
     }
 
@@ -128,7 +137,12 @@ public class DeduplicacionDeAlertasService {
 
         return buscarIncidenteAbierto(entrante.getFingerprint(), servicio.getId(), recibidaEn)
             .map(incidente -> deduplicar(alerta, incidente))
-            .orElseGet(() -> abrirIncidente(alerta, servicio));
+            .orElseGet(() ->
+                mantenimientoVigenteService
+                    .ventanaVigente(servicio.getId(), recibidaEn)
+                    .map(vigente -> suprimir(alerta, vigente))
+                    .orElseGet(() -> abrirIncidente(alerta, servicio))
+            );
     }
 
     /**
@@ -180,6 +194,33 @@ public class DeduplicacionDeAlertasService {
             ocurrencias,
             motivo
         );
+    }
+
+    /**
+     * Camino C: no hay nada abierto, pero el servicio esta en mantenimiento. La alerta queda
+     * registrada y no abre incidente.
+     */
+    private ResultadoDeduplicacionDTO suprimir(Alerta alerta, MantenimientoVigenteService.VentanaVigente vigente) {
+        alerta.setProcesada(true);
+        alerta.setSuprimidaPor(vigente.ventana());
+        Alerta guardada = alertaRepository.saveAndFlush(alerta);
+
+        String motivo =
+            "Alerta suprimida: el servicio '" +
+            guardada.getServicio().getNombre() +
+            "' esta en la ventana de mantenimiento '" +
+            vigente.ventana().getNombre() +
+            "' (" +
+            vigente.ocurrencia().desde() +
+            " a " +
+            vigente.ocurrencia().hasta() +
+            ") y no habia incidente abierto para el fingerprint '" +
+            guardada.getFingerprint() +
+            "'. No se abrio un incidente.";
+
+        LOG.debug("Alerta {} suprimida por la ventana {}", guardada.getId(), vigente.ventana().getId());
+
+        return new ResultadoDeduplicacionDTO(guardada.getId(), null, null, ResultadoDeduplicacionDTO.Accion.ALERTA_SUPRIMIDA, 0L, motivo);
     }
 
     /**

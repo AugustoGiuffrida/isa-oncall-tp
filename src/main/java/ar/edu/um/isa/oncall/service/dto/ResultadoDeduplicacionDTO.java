@@ -13,13 +13,15 @@ public class ResultadoDeduplicacionDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Las dos unicas salidas posibles de la regla.
+     * Las salidas posibles de la regla.
      */
     public enum Accion {
         /** No habia incidente abierto para ese fingerprint: se abrio uno. */
         INCIDENTE_ABIERTO,
         /** Ya habia un incidente abierto: la alerta se pego a ese y no se abrio otro. */
         ALERTA_DEDUPLICADA,
+        /** No habia incidente abierto, pero el servicio esta en mantenimiento: no se abrio nada. */
+        ALERTA_SUPRIMIDA,
     }
 
     private Long alertaId;

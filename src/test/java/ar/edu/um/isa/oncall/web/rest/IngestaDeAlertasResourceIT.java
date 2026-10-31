@@ -11,10 +11,13 @@ import ar.edu.um.isa.oncall.domain.Equipo;
 import ar.edu.um.isa.oncall.domain.EventoDeIncidente;
 import ar.edu.um.isa.oncall.domain.Incidente;
 import ar.edu.um.isa.oncall.domain.Servicio;
+import ar.edu.um.isa.oncall.domain.ServicioEnVentana;
+import ar.edu.um.isa.oncall.domain.VentanaDeMantenimiento;
 import ar.edu.um.isa.oncall.domain.enumeration.Criticidad;
 import ar.edu.um.isa.oncall.domain.enumeration.Entorno;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoIncidente;
 import ar.edu.um.isa.oncall.domain.enumeration.OrigenAlerta;
+import ar.edu.um.isa.oncall.domain.enumeration.Recurrencia;
 import ar.edu.um.isa.oncall.domain.enumeration.Severidad;
 import ar.edu.um.isa.oncall.domain.enumeration.TipoEvento;
 import ar.edu.um.isa.oncall.repository.AlertaRepository;
@@ -233,6 +236,28 @@ class IngestaDeAlertasResourceIT {
             .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @Transactional
+    @DisplayName("Una alerta de un servicio en mantenimiento no abre incidente y queda suprimida por la ventana")
+    void enMantenimientoLaAlertaQuedaSuprimida() throws Exception {
+        Servicio servicio = servicioPersistido(Criticidad.TIER1);
+        VentanaDeMantenimiento ventana = ventanaSobre(servicio, RECIBIDA_EN.minusSeconds(600), RECIBIDA_EN.plusSeconds(3600));
+        long incidentesAntes = incidenteRepository.count();
+
+        ingestar(servicio, FINGERPRINT, RECIBIDA_EN)
+            .andExpect(jsonPath("$.accion").value("ALERTA_SUPRIMIDA"))
+            .andExpect(jsonPath("$.incidenteId").doesNotExist());
+
+        assertThat(incidenteRepository.count()).isEqualTo(incidentesAntes);
+        Alerta alerta = alertasDe(servicio).get(0);
+        assertThat(alerta.getProcesada()).isTrue();
+        assertThat(alerta.getIncidente()).isNull();
+        assertThat(alerta.getSuprimidaPor().getId()).isEqualTo(ventana.getId());
+
+        // terminada la ventana, la misma senal abre un incidente
+        ingestar(servicio, FINGERPRINT, RECIBIDA_EN.plusSeconds(7200)).andExpect(jsonPath("$.accion").value("INCIDENTE_ABIERTO"));
+    }
+
     // ---------------------------------------------------------------------
     // Utilidades
     // ---------------------------------------------------------------------
@@ -272,6 +297,21 @@ class IngestaDeAlertasResourceIT {
         em.persist(servicio);
         em.flush();
         return servicio;
+    }
+
+    /** Una ventana unica, en UTC, que cubre al servicio entre desde y hasta. */
+    private VentanaDeMantenimiento ventanaSobre(Servicio servicio, Instant desde, Instant hasta) {
+        VentanaDeMantenimiento ventana = new VentanaDeMantenimiento()
+            .nombre("ventana-" + SECUENCIA.incrementAndGet())
+            .desde(desde)
+            .hasta(hasta)
+            .recurrencia(Recurrencia.UNICA)
+            .zonaHoraria("UTC")
+            .activa(true);
+        em.persist(ventana);
+        em.persist(new ServicioEnVentana().ventana(ventana).servicio(servicio));
+        em.flush();
+        return ventana;
     }
 
     private Incidente incidenteDe(Servicio servicio) {

@@ -13,6 +13,7 @@ import ar.edu.um.isa.oncall.domain.Alerta;
 import ar.edu.um.isa.oncall.domain.EventoDeIncidente;
 import ar.edu.um.isa.oncall.domain.Incidente;
 import ar.edu.um.isa.oncall.domain.Servicio;
+import ar.edu.um.isa.oncall.domain.VentanaDeMantenimiento;
 import ar.edu.um.isa.oncall.domain.enumeration.Criticidad;
 import ar.edu.um.isa.oncall.domain.enumeration.EstadoIncidente;
 import ar.edu.um.isa.oncall.domain.enumeration.OrigenAlerta;
@@ -70,6 +71,9 @@ class DeduplicacionDeAlertasServiceTest {
     @Mock
     private ServicioRepository servicioRepository;
 
+    @Mock
+    private MantenimientoVigenteService mantenimientoVigenteService;
+
     @Captor
     private ArgumentCaptor<EventoDeIncidente> eventoCaptor;
 
@@ -90,6 +94,7 @@ class DeduplicacionDeAlertasServiceTest {
             incidenteDeduplicacionRepository,
             eventoDeIncidenteRepository,
             servicioRepository,
+            mantenimientoVigenteService,
             ventanaMinutos
         );
     }
@@ -325,6 +330,54 @@ class DeduplicacionDeAlertasServiceTest {
         assertThatThrownBy(() -> nuevoServicio(0))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("ventana-minutos");
+    }
+
+    // ---------------------------------------------------------------------
+    // Ventanas de mantenimiento
+    // ---------------------------------------------------------------------
+
+    @Test
+    @DisplayName("Sin incidente abierto y con el servicio en mantenimiento, la alerta se suprime: no abre incidente")
+    void enMantenimientoLaAlertaSeSuprime() {
+        darDeAltaElServicio();
+        noHayIncidentesAbiertos();
+        alertaGuardadaConId();
+        VentanaDeMantenimiento ventana = new VentanaDeMantenimiento().id(9L).nombre("parche de los martes");
+        when(mantenimientoVigenteService.ventanaVigente(SERVICIO_ID, RECIBIDA_EN)).thenReturn(
+            Optional.of(
+                new MantenimientoVigenteService.VentanaVigente(
+                    ventana,
+                    new MantenimientoVigenteService.Ocurrencia(RECIBIDA_EN.minusSeconds(600), RECIBIDA_EN.plusSeconds(3000), false)
+                )
+            )
+        );
+
+        ResultadoDeduplicacionDTO resultado = servicioDeDeduplicacion.ingestar(alertaEntrante());
+
+        assertThat(resultado.getAccion()).isEqualTo(ResultadoDeduplicacionDTO.Accion.ALERTA_SUPRIMIDA);
+        assertThat(resultado.getIncidenteId()).isNull();
+        assertThat(resultado.getMotivo()).contains("parche de los martes");
+        ArgumentCaptor<Alerta> alertaCaptor = ArgumentCaptor.forClass(Alerta.class);
+        verify(alertaRepository).saveAndFlush(alertaCaptor.capture());
+        assertThat(alertaCaptor.getValue().getProcesada()).isTrue();
+        assertThat(alertaCaptor.getValue().getIncidente()).isNull();
+        assertThat(alertaCaptor.getValue().getSuprimidaPor()).isEqualTo(ventana);
+        verify(incidenteRepository, never()).saveAndFlush(any());
+        verify(eventoDeIncidenteRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Con un incidente abierto, la alerta se le pega aunque el servicio este en mantenimiento")
+    void conIncidenteAbiertoLaVentanaNoSuprime() {
+        darDeAltaElServicio();
+        hayUnIncidenteAbierto(incidenteAbierto(42L));
+        alertaGuardadaConId();
+        when(incidenteDeduplicacionRepository.contarAlertasConFingerprint(42L, FINGERPRINT)).thenReturn(2L);
+
+        ResultadoDeduplicacionDTO resultado = servicioDeDeduplicacion.ingestar(alertaEntrante());
+
+        assertThat(resultado.getAccion()).isEqualTo(ResultadoDeduplicacionDTO.Accion.ALERTA_DEDUPLICADA);
+        verify(mantenimientoVigenteService, never()).ventanaVigente(anyLong(), any());
     }
 
     // ---------------------------------------------------------------------
